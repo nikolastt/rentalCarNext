@@ -21,7 +21,7 @@ import { GetStaticProps } from "next";
 const pages = [
   { name: "Home", path: "/" },
   { name: "Veículos", path: "/Booking" },
-  { name: "Meus Favoritos", path: "/myFavorites" },
+  { name: "Meus Favoritos", path: "/Favorites" },
   { name: "Adicionar Veículo", path: "/AddVeicle" },
 ];
 const settings = ["Perfil", "Account", "Dashboard", "Sair"];

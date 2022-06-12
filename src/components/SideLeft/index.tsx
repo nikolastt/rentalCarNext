@@ -4,12 +4,16 @@ import FilterByCategoryCollapse from "../FilterByCategoryCollapse";
 
 import { Container, Title } from "./styles";
 
-const SideLeft: React.FC = () => {
+interface ISideLeftProps {
+  isTypeFavorite: boolean;
+}
+
+const SideLeft: React.FC<ISideLeftProps> = ({ isTypeFavorite }) => {
   return (
     <Container>
       <Title>Filtrar 🎯 </Title>
       <hr />
-      <FilterByCategoryCollapse />
+      <FilterByCategoryCollapse isTypeFavorite={isTypeFavorite} />
       <CarSeats />
     </Container>
   );

@@ -17,13 +17,18 @@ import Pagination from "@mui/material/Pagination";
 import { Box } from "@mui/material";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
+import { setFavoriteCars } from "../../redux/favoriteslice";
 
-const Booking: React.FC = () => {
+const Favorites: React.FC = () => {
   const [carsInScreen, setCarsInScreen] = useState<ICarProps[]>([]);
   const [cars, setCars] = useState<ICarProps[]>([]);
   const filter = useSelector((state: RootState) => state.filterByCategory);
-  const carsRedux = useSelector((state: RootState) => state.carsSlice.cars);
+  const favoriteCars = useSelector(
+    (state: RootState) => state.favoritesSlice.cars
+  );
   const dispatch = useDispatch();
+
+  console.log(favoriteCars, "favorites");
 
   useEffect(() => {
     async function getCarsDb() {
@@ -34,19 +39,18 @@ const Booking: React.FC = () => {
         arrayCars.push(doc.data());
       });
       setCars(arrayCars);
-      dispatch(getCars(arrayCars));
+      dispatch(setFavoriteCars(arrayCars));
     }
 
-    if (carsRedux.length > 0) {
-      setCars(carsRedux);
+    if (favoriteCars.length > 0) {
+      setCars(favoriteCars);
     } else {
-      getCarsDb();
+      // getCarsDb();
     }
-  }, [carsRedux, dispatch]);
+  }, [favoriteCars, dispatch]);
 
   useEffect(() => {
     function handleCarsInScreen() {
-      console.log(filter, "Filter");
       const newCars = cars.filter((item) => {
         return (
           filter.includes(item.category.toLowerCase()) ||
@@ -68,7 +72,7 @@ const Booking: React.FC = () => {
     <>
       <AppBar />
       <Container>
-        <SideLeft isTypeFavorite={false} />
+        <SideLeft isTypeFavorite={true} />
 
         {carsInScreen.length > 0 ? (
           <Content>
@@ -108,7 +112,7 @@ const Booking: React.FC = () => {
   );
 };
 
-export default Booking;
+export default Favorites;
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const session = await getSession({ req });

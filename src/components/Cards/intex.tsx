@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Card } from "react-bootstrap";
 import { FaUser } from "react-icons/fa";
 import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
@@ -15,6 +15,9 @@ import {
   Seats,
 } from "./styles";
 import { Skeleton, Stack, useTheme } from "@mui/material";
+import { addFavoriteCar, removeFavoriteCar } from "../../redux/favoriteslice";
+import { ICarProps } from "../../redux/carsSlice";
+import { useDispatch } from "react-redux";
 
 interface ICardProps {
   title: string;
@@ -25,6 +28,8 @@ interface ICardProps {
   isTypeFavorite?: boolean;
   seats: string;
   gear: string;
+  carFavorite: boolean;
+  car: ICarProps;
 }
 
 const Cards: React.FC<ICardProps> = ({
@@ -36,9 +41,24 @@ const Cards: React.FC<ICardProps> = ({
   isTypeFavorite,
   seats,
   gear,
+  car,
+  carFavorite,
 }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const theme = useTheme();
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    isFavorite
+      ? dispatch(addFavoriteCar(car))
+      : dispatch(removeFavoriteCar(car));
+
+    console.log(isFavorite, "2");
+    // isFavorite ? addFavorite() : removeFavorite();
+  }, [car, dispatch, isFavorite]);
+
+  console.log(isFavorite, "Fora da função");
 
   return (
     <Container width={width}>
@@ -60,13 +80,19 @@ const Cards: React.FC<ICardProps> = ({
                 {title}
               </Card.Title>
               {isTypeFavorite ?? (
-                <IconHeaderFavoriteContainer
-                  onClick={() => setIsFavorite(!isFavorite)}
-                >
+                <IconHeaderFavoriteContainer>
                   {isFavorite ? (
-                    <MdFavorite size={20} color="red" />
+                    <MdFavorite
+                      size={20}
+                      color="red"
+                      onClick={() => setIsFavorite(false)}
+                    />
                   ) : (
-                    <MdFavoriteBorder size={20} color="white" />
+                    <MdFavoriteBorder
+                      size={20}
+                      color="white"
+                      onClick={() => setIsFavorite(true)}
+                    />
                   )}
                 </IconHeaderFavoriteContainer>
               )}

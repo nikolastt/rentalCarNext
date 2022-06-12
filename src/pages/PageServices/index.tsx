@@ -145,12 +145,14 @@ const PageServices: React.FC = () => {
             return (
               <SwiperSlide key={car.model + index}>
                 <Cards
+                  car={car}
                   title={car.model}
                   img={car.img}
                   amount={car.amount}
                   autoMaker={car.autoMaker}
                   gear={car.gear}
                   seats={car.seats}
+                  isTypeFavorite={false}
                 />
               </SwiperSlide>
             );
