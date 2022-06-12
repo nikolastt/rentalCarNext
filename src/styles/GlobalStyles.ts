@@ -1,4 +1,4 @@
-import {createGlobalStyle} from 'styled-components'
+import { createGlobalStyle } from "styled-components";
 
 export default createGlobalStyle`
 
@@ -9,14 +9,14 @@ export default createGlobalStyle`
     }
 
     html{
-        background-color: ${props => props.theme.colors.backgroundColor}
+        background-color: ${(props) => props.theme.colors.backgroundColor}
     }
 
     html, body, #root{
         padding: 0 1rem ;
         height: 100%;
-        background-color: ${props => props.theme.colors.backgroundColor};
-        color: ${props => props.theme.colors.white}
+        background-color: ${(props) => props.theme.colors.backgroundColor};
+        color: ${(props) => props.theme.colors.white}
     }
 
     *, button, input{
@@ -27,6 +27,12 @@ export default createGlobalStyle`
 
     a{ 
         text-decoration: none ;       
+        color: inherit;
+    }
+
+    a:hover{
+        text-decoration: none ;       
+        color: inherit;
     }
 
 
@@ -35,6 +41,4 @@ export default createGlobalStyle`
         cursor: pointer;
     }
 
-`
-
-
+`;

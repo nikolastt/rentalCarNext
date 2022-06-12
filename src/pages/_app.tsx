@@ -14,14 +14,19 @@ import { Provider } from "react-redux";
 import GlobalStyles from "../styles/GlobalStyles";
 import { ThemeProvider } from "styled-components";
 
+import { SessionProvider } from "next-auth/react";
+
 const clientSideEmotionCache = createEmotionCache();
 
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
 }
 
-export default function MyApp(props: MyAppProps) {
-  const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
+export default function MyApp(
+  { Component, pageProps: { session, ...pageProps } }: AppProps,
+  props: MyAppProps
+) {
+  const { emotionCache = clientSideEmotionCache } = props;
   return (
     <CacheProvider value={emotionCache}>
       <Head>
@@ -32,7 +37,9 @@ export default function MyApp(props: MyAppProps) {
           <CssBaseline />
           <Provider store={store}>
             <GlobalStyles />
-            <Component {...pageProps} />
+            <SessionProvider session={session}>
+              <Component {...pageProps} />
+            </SessionProvider>
           </Provider>
         </ThemeProvider>
       </ThemeProviderMUI>

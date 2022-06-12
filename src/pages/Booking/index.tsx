@@ -15,6 +15,8 @@ import { db } from "../../firebase";
 
 import Pagination from "@mui/material/Pagination";
 import { Box } from "@mui/material";
+import { GetServerSideProps } from "next";
+import { getSession } from "next-auth/react";
 
 const Booking: React.FC = () => {
   const [carsInScreen, setCarsInScreen] = useState<ICarProps[]>([]);
@@ -106,3 +108,20 @@ const Booking: React.FC = () => {
 };
 
 export default Booking;
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const session = await getSession({ req });
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+};

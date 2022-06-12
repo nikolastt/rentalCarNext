@@ -1,18 +1,15 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore } from "@reduxjs/toolkit";
 
-import  filterByCategory  from './filterByCategorySlice'
-import  carsSlice  from './carsSlice'
-import  userSlice from './userSlice'
+import filterByCategory from "./filterByCategorySlice";
+import carsSlice from "./carsSlice";
 
 export const store = configureStore({
   reducer: {
-      filterByCategory,
-      carsSlice,
-      userSlice,
+    filterByCategory,
+    carsSlice,
   },
-})
+});
 
+export type RootState = ReturnType<typeof store.getState>;
 
-export type RootState = ReturnType<typeof store.getState>
-
-export type AppDispatch = typeof store.dispatch
+export type AppDispatch = typeof store.dispatch;

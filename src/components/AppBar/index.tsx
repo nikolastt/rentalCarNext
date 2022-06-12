@@ -12,17 +12,11 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
 
-import { FcGoogle } from "react-icons/fc";
+import { signIn, signOut, useSession } from "next-auth/react";
 
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../redux/store";
-
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { app } from "../../firebase/index";
-
-import { logOutUser, setUser } from "../../redux/userSlice";
+import { AiFillGithub } from "react-icons/ai";
+import { GetStaticProps } from "next";
 
 const pages = [
   { name: "Home", path: "/" },
@@ -55,56 +49,14 @@ const ResponsiveAppBar = () => {
     setAnchorElUser(null);
   };
 
-  const dispatch = useDispatch();
-
-  const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    const auth = getAuth(app);
-
-    await signInWithPopup(auth, provider)
-      .then((result) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential?.accessToken;
-        const user = result.user;
-
-        dispatch(
-          setUser({
-            displayName: user.displayName,
-            email: user.email,
-            photoURL: user.photoURL,
-            uid: user.uid,
-          })
-        );
-
-        sessionStorage.setItem(
-          "@AuthFirebaseGoogle:user",
-          JSON.stringify(user)
-        );
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        const email = error.email;
-        const credential = GoogleAuthProvider.credentialFromError(error);
-      });
-  };
-
-  const user = useSelector((state: RootState) => state.userSlice.user);
-
   const manageSettingsOptions = (option: string) => {
     if (option === "Sair") {
       handleCloseUserMenu();
-      dispatch(logOutUser());
+      signOut();
     }
   };
 
-  React.useEffect(() => {
-    const sessionUser = sessionStorage.getItem("@AuthFirebaseGoogle:user");
-
-    if (sessionUser && !user.email) {
-      dispatch(setUser(JSON.parse(sessionUser)));
-    }
-  }, []);
+  const { data: session } = useSession();
 
   return (
     <AppBar
@@ -223,20 +175,23 @@ const ResponsiveAppBar = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            {user.email ? (
+            {session ? (
               <Tooltip title="Abrir configurações do perfil">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Nikolas Bitencourt" src={user?.photoURL} />
+                  <Avatar
+                    alt="Nikolas Bitencourt"
+                    src={session.user?.image?.toString()}
+                  />
                 </IconButton>
               </Tooltip>
             ) : (
               <Button
                 variant="outlined"
                 color="primary"
-                onClick={handleGoogleLogin}
+                onClick={() => signIn("github")}
               >
                 login com
-                <FcGoogle size={35} style={{ marginLeft: "1rem" }} />
+                <AiFillGithub size={30} style={{ marginLeft: "1rem" }} />
               </Button>
             )}
 
@@ -272,3 +227,10 @@ const ResponsiveAppBar = () => {
   );
 };
 export default ResponsiveAppBar;
+
+export const getStaticProps: GetStaticProps = async () => {
+  return {
+    props: {},
+    revalidate: 60,
+  };
+};
