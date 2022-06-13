@@ -28,8 +28,9 @@ interface ICardProps {
   isTypeFavorite?: boolean;
   seats: string;
   gear: string;
-  carFavorite: boolean;
+  carFavorite?: boolean;
   car: ICarProps;
+  setFavorite?: boolean;
 }
 
 const Cards: React.FC<ICardProps> = ({
@@ -43,8 +44,9 @@ const Cards: React.FC<ICardProps> = ({
   gear,
   car,
   carFavorite,
+  setFavorite,
 }) => {
-  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(setFavorite || false);
   const theme = useTheme();
 
   const dispatch = useDispatch();

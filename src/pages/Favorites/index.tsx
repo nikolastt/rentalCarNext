@@ -88,6 +88,7 @@ const Favorites: React.FC = () => {
                   seats={item.seats}
                   gear={item.gear}
                   width="33.3%"
+                  carFavorite={true}
                 />
               );
             })}
