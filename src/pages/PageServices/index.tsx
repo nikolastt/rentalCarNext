@@ -145,16 +145,7 @@ const PageServices: React.FC = () => {
           {getCarsPromotion?.map((car, index) => {
             return (
               <SwiperSlide key={car.model + index}>
-                <Cards
-                  car={car}
-                  title={car.model}
-                  img={car.img}
-                  amount={car.amount}
-                  autoMaker={car.autoMaker}
-                  gear={car.gear}
-                  seats={car.seats}
-                  isTypeFavorite={false}
-                />
+                <Cards car={car} isTypeFavorite={false} />
               </SwiperSlide>
             );
           })}
