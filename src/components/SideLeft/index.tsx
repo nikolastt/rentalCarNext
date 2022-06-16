@@ -14,7 +14,7 @@ const SideLeft: React.FC<ISideLeftProps> = ({ isTypeFavorite }) => {
       <Title>Filtrar 🎯 </Title>
       <hr />
       <FilterByCategoryCollapse isTypeFavorite={isTypeFavorite} />
-      <CarSeats />
+      <CarSeats isTypeFavorite={isTypeFavorite} />
     </Container>
   );
 };

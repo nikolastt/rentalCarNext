@@ -12,10 +12,20 @@ interface ISeatsAmount {
   count: number;
 }
 
-const CarSeats: React.FC = () => {
+interface ICarSeats {
+  isTypeFavorite?: boolean;
+}
+
+const CarSeats: React.FC<ICarSeats> = ({ isTypeFavorite }) => {
   const [isCollapseUp, setIsCollapseUp] = useState(true);
 
-  const cars = useSelector((state: RootState) => state.carsSlice.cars);
+  const cars = useSelector((state: RootState) => {
+    if (isTypeFavorite) {
+      return state.favoritesSlice.cars;
+    } else {
+      return state.carsSlice.cars;
+    }
+  });
   const dispatch = useDispatch();
 
   function handleCollapse() {

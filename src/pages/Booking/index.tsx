@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Cards from "../../components/Cards/intex";
+import Cards, { IDataProps } from "../../components/Cards/intex";
 
 import { Container, Content } from "../../stylePages/stylesBooking";
 
@@ -9,7 +9,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../redux/store";
 import AppBar from "../../components/AppBar";
 
-import { getCars, ICarProps } from "../../redux/carsSlice";
+import { ICarProps } from "../../redux/carsSlice";
 import { collection, getDocs, query, limit } from "firebase/firestore";
 import { db } from "../../firebase";
 
@@ -17,36 +17,38 @@ import Pagination from "@mui/material/Pagination";
 import { Box } from "@mui/material";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
+import { setUSer } from "../../redux/userSlice";
 
-const Booking: React.FC = () => {
+import { store } from "../../redux/store";
+
+interface IUserProps {
+  name: string;
+  email: string;
+  image: string;
+  id: string;
+}
+
+interface IBooking {
+  user: IUserProps;
+  arrayCars: ICarProps[];
+  arrayFavorites: IDataProps[];
+}
+
+const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
   const [carsInScreen, setCarsInScreen] = useState<ICarProps[]>([]);
-  const [cars, setCars] = useState<ICarProps[]>([]);
   const filter = useSelector((state: RootState) => state.filterByCategory);
-  const carsRedux = useSelector((state: RootState) => state.carsSlice.cars);
   const dispatch = useDispatch();
+  const cars = arrayCars;
 
+  const userStore = useSelector((state: RootState) => state.userSlice.user);
   useEffect(() => {
-    async function getCarsDb() {
-      const arrayCars: any = [];
-      const querySnapshot = query(collection(db, "cars"));
-      const documents = await getDocs(querySnapshot);
-      documents.forEach((doc) => {
-        arrayCars.push(doc.data());
-      });
-      setCars(arrayCars);
-      dispatch(getCars(arrayCars));
+    if (!userStore.email) {
+      dispatch(setUSer(user));
     }
-
-    if (carsRedux.length > 0) {
-      setCars(carsRedux);
-    } else {
-      getCarsDb();
-    }
-  }, [carsRedux, dispatch]);
+  }, [dispatch, user, userStore]);
 
   useEffect(() => {
     function handleCarsInScreen() {
-      console.log(filter, "Filter");
       const newCars = cars.filter((item) => {
         return (
           filter.includes(item.category.toLowerCase()) ||
@@ -77,13 +79,8 @@ const Booking: React.FC = () => {
                 <Cards
                   car={item}
                   key={item.model}
-                  title={item.model}
-                  img={item.img}
-                  amount={item.amount}
-                  autoMaker={item.autoMaker}
-                  seats={item.seats}
-                  gear={item.gear}
                   width="33.3%"
+                  favorites={arrayFavorites}
                 />
               );
             })}
@@ -122,7 +119,45 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
+  const state = store.getState();
+
+  const cars = state.carsSlice.cars;
+  const favorites = state.favoritesSlice.cars;
+  let arrayCars: any = [];
+  let arrayFavorites: any = [];
+
+  if (favorites.length > 0) {
+    arrayFavorites = favorites;
+  } else {
+    const querySnapshot = query(collection(db, "Favorites"));
+    const documents = await getDocs(querySnapshot);
+    documents.forEach((doc) => {
+      arrayFavorites.push({ ...doc.data(), id: doc.id });
+    });
+  }
+
+  if (cars.length > 0) {
+    arrayCars = cars;
+  } else {
+    const querySnapshot = query(collection(db, "cars"));
+    const documents = await getDocs(querySnapshot);
+    documents.forEach((doc) => {
+      arrayCars.push(doc.data());
+    });
+  }
+
+  const user = {
+    name: session.user?.name,
+    email: session.user?.email,
+    image: session.user?.image,
+    id: session.id,
+  };
+
   return {
-    props: {},
+    props: {
+      user,
+      arrayCars,
+      arrayFavorites,
+    },
   };
 };

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export interface ICarProps {
+export interface ICarFavoriteProps {
   model: string;
   autoMaker: string;
   amount: string;
@@ -9,10 +9,12 @@ export interface ICarProps {
   img: string;
   seats: string;
   gear: string;
+  id: string;
+  userId: string;
 }
 
 const initialState = {
-  cars: <ICarProps[]>[],
+  cars: <ICarFavoriteProps[]>[],
 };
 
 export const favoriteSlice = createSlice({

@@ -194,6 +194,20 @@ const AddVeicle: React.FC = () => {
     }
   }
 
+  const car = {
+    model,
+    autoMaker,
+    amount,
+    typeFuel,
+    category,
+    img:
+      img === ""
+        ? "https://media.discordapp.net/attachments/730409029217681421/969777144827904030/unknown.png?width=1352&height=676"
+        : img,
+    seats,
+    gear,
+  };
+
   return (
     <>
       <AppBar />
@@ -348,19 +362,7 @@ const AddVeicle: React.FC = () => {
             </Inputs>
 
             <BoxCard>
-              <Cards
-                width="100%"
-                title={model}
-                autoMaker={autoMaker}
-                img={
-                  img ||
-                  "https://media.discordapp.net/attachments/730409029217681421/969777144827904030/unknown.png?width=1352&height=676"
-                }
-                amount={amount}
-                isTypeFavorite={false}
-                seats={seats}
-                gear={gear}
-              />
+              <Cards car={car} width="100%" isTypeFavorite={false} />
             </BoxCard>
           </ContentHeader>
 

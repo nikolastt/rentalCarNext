@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import {
   Container,
@@ -34,6 +34,7 @@ import { RootState } from "../../redux/store";
 import Image from "next/image";
 
 import veicleHomePage from "../../../public/images/veicleHomePage.png";
+import { GetStaticProps } from "next";
 
 const PageServices: React.FC = () => {
   const dispatch = useDispatch();
@@ -187,3 +188,9 @@ const PageServices: React.FC = () => {
 };
 
 export default PageServices;
+
+export const getStaticProps: GetStaticProps = async () => {
+  return {
+    props: {},
+  };
+};

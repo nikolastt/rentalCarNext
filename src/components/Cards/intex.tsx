@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import { FaUser } from "react-icons/fa";
 import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
@@ -17,54 +17,117 @@ import {
 import { Skeleton, Stack, useTheme } from "@mui/material";
 import { addFavoriteCar, removeFavoriteCar } from "../../redux/favoriteslice";
 import { ICarProps } from "../../redux/carsSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { addDoc, collection, deleteDoc, doc } from "firebase/firestore";
+import { db } from "../../firebase/index";
+import { RootState } from "../../redux/store";
 
 interface ICardProps {
-  title: string;
-  img: string;
-  amount: string;
-  autoMaker: string;
   width?: string;
   isTypeFavorite?: boolean;
-  seats: string;
-  gear: string;
-  carFavorite?: boolean;
   car: ICarProps;
   setFavorite?: boolean;
+  favorites?: IDataProps[];
+}
+
+export interface IDataProps {
+  model: string;
+  autoMaker: string;
+  amount: string;
+  typeFuel: string;
+  category: string;
+  img: string;
+  seats: string;
+  gear: string;
+  userId: string;
+  id: string;
 }
 
 const Cards: React.FC<ICardProps> = ({
-  title,
-  img,
-  amount,
-  autoMaker,
   width,
   isTypeFavorite,
-  seats,
-  gear,
   car,
-  carFavorite,
   setFavorite,
+  favorites,
 }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(setFavorite || false);
   const theme = useTheme();
-
+  const user = useSelector((state: RootState) => state.userSlice.user);
+  const [carFavorite, setCarFavorite] = useState<IDataProps>();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    isFavorite
-      ? dispatch(addFavoriteCar(car))
-      : dispatch(removeFavoriteCar(car));
+    favorites?.map((carDb) => {
+      if (carDb.model.toLowerCase() === car.model.toLowerCase()) {
+        setIsFavorite(true);
+        setCarFavorite(carDb);
+      }
+    });
+  }, [car.model, favorites]);
 
-    console.log(isFavorite, "2");
-    // isFavorite ? addFavorite() : removeFavorite();
-  }, [car, dispatch, isFavorite]);
+  const addFavoriteCarBD = async () => {
+    const ref = collection(db, "Favorites");
+    await addDoc(ref, {
+      model: car.model,
+      autoMaker: car.autoMaker,
+      amount: car.amount,
+      typeFuel: car.typeFuel,
+      category: car.category,
+      img: car.img,
+      seats: car.seats,
+      gear: car.gear,
+      userId: user?.id,
+    }).then((doc) => {
+      let data = {
+        model: car.model,
+        autoMaker: car.autoMaker,
+        amount: car.amount,
+        typeFuel: car.typeFuel,
+        category: car.category,
+        img: car.img,
+        seats: car.seats,
+        gear: car.gear,
+        userId: user?.id,
+        id: doc.id,
+      };
+      console.log(doc.id, "Id carro cadastrado");
+      dispatch(addFavoriteCar(data));
+      setCarFavorite(data);
+    });
+  };
 
-  console.log(isFavorite, "Fora da função");
+  const removeFavoriteCarBD = async () => {
+    if (!carFavorite?.id) {
+      return;
+    } else {
+      console.log(carFavorite.id, "Id carro excluir");
+      await deleteDoc(doc(db, "Favorites", carFavorite.id)).then((doc) => {
+        try {
+          dispatch(removeFavoriteCar(car));
+        } catch {
+          console.log("Erro ao retirar veículo do state - store.");
+        }
+      });
+    }
+  };
+
+  const handleIcon = () => {
+    setIsFavorite((prevState) => {
+      if (!prevState) {
+        addFavoriteCarBD();
+        console.log("Adicionar Carro");
+      } else {
+        removeFavoriteCarBD();
+        console.log("Remover Carro");
+      }
+
+      return !prevState;
+    });
+  };
 
   return (
     <Container width={width}>
-      {!img ? (
+      {!car.img ? (
         <Stack spacing={1}>
           <Skeleton
             variant="rectangular"
@@ -78,59 +141,51 @@ const Cards: React.FC<ICardProps> = ({
           <Card.Header className="cardHeader">
             <ContentHeader>
               <Card.Title className="cardTitle">
-                {autoMaker + " "}
-                {title}
+                {car.autoMaker + " "}
+                {car.model}
               </Card.Title>
               {isTypeFavorite ?? (
-                <IconHeaderFavoriteContainer>
+                <IconHeaderFavoriteContainer onClick={handleIcon}>
                   {isFavorite ? (
-                    <MdFavorite
-                      size={20}
-                      color="red"
-                      onClick={() => setIsFavorite(false)}
-                    />
+                    <MdFavorite size={20} color="red" />
                   ) : (
-                    <MdFavoriteBorder
-                      size={20}
-                      color="white"
-                      onClick={() => setIsFavorite(true)}
-                    />
+                    <MdFavoriteBorder size={20} color="white" />
                   )}
                 </IconHeaderFavoriteContainer>
               )}
             </ContentHeader>
           </Card.Header>
-          <Card.Img className="cardImg" variant="bottom" src={img} />
+          <Card.Img className="cardImg" variant="bottom" src={car.img} />
           <Card.Footer className="cardFooter">
             <ContentFooter>
               <SideLeftContentFooter>
-                {seats ? (
+                {car.seats ? (
                   <Seats>
                     <FaUser size={18} color={theme.palette.text.primary} />
-                    <p>{seats}</p>
+                    <p>{car.seats}</p>
                   </Seats>
                 ) : (
                   ""
                 )}
 
-                {gear ? (
+                {car.gear ? (
                   <Gears>
                     <GiGearStickPattern
                       size={18}
                       color={theme.palette.text.primary}
                     />
-                    <strong>{gear == "automatico" ? "A" : "M"}</strong>
+                    <strong>{car.gear == "automatico" ? "A" : "M"}</strong>
                   </Gears>
                 ) : (
                   ""
                 )}
               </SideLeftContentFooter>
 
-              {amount ? (
+              {car.amount ? (
                 <Amount>
                   <p>R$ </p>
 
-                  <strong>{amount}</strong>
+                  <strong>{car.amount}</strong>
                 </Amount>
               ) : (
                 ""

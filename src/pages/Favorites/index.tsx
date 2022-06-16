@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import Cards from "../../components/Cards/intex";
+import Cards, { IDataProps } from "../../components/Cards/intex";
 
 import { Container, Content } from "../../stylePages/stylesBooking";
 
 import SideLeft from "../../components/SideLeft";
 
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../redux/store";
+import { RootState, store } from "../../redux/store";
 import AppBar from "../../components/AppBar";
 
 import { getCars, ICarProps } from "../../redux/carsSlice";
@@ -18,42 +18,55 @@ import { Box } from "@mui/material";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import { setFavoriteCars } from "../../redux/favoriteslice";
+import { setUSer } from "../../redux/userSlice";
 
-const Favorites: React.FC = () => {
+interface IUserProps {
+  name: string;
+  email: string;
+  image: string;
+  id: string;
+}
+
+interface IFavorite {
+  user: IUserProps;
+  arrayCars: ICarProps[];
+  arrayFavorites: IDataProps[];
+}
+
+const Favorites: React.FC<IFavorite> = ({
+  user,
+  arrayCars,
+  arrayFavorites,
+}) => {
   const [carsInScreen, setCarsInScreen] = useState<ICarProps[]>([]);
-  const [cars, setCars] = useState<ICarProps[]>([]);
   const filter = useSelector((state: RootState) => state.filterByCategory);
-  const favoriteCars = useSelector(
+  const dispatch = useDispatch();
+  const userStore = useSelector((state: RootState) => state.userSlice.user);
+
+  const favorites = useSelector(
     (state: RootState) => state.favoritesSlice.cars
   );
-  const dispatch = useDispatch();
 
-  console.log(favoriteCars, "favorites");
+  const cars = favorites;
+  useEffect(() => {
+    if (!userStore.email) {
+      dispatch(setUSer(user));
+    }
+  }, [dispatch, user, userStore]);
 
   useEffect(() => {
-    async function getCarsDb() {
-      const arrayCars: any = [];
-      const querySnapshot = query(collection(db, "cars"));
-      const documents = await getDocs(querySnapshot);
-      documents.forEach((doc) => {
-        arrayCars.push(doc.data());
-      });
-      setCars(arrayCars);
-      dispatch(setFavoriteCars(arrayCars));
-    }
-
-    if (favoriteCars.length > 0) {
-      setCars(favoriteCars);
+    if (favorites.length > 0) {
+      return;
     } else {
-      // getCarsDb();
+      dispatch(setFavoriteCars(arrayFavorites));
     }
-  }, [favoriteCars, dispatch]);
+  }, [arrayFavorites, dispatch, favorites.length]);
 
   useEffect(() => {
     function handleCarsInScreen() {
       const newCars = cars.filter((item) => {
         return (
-          filter.includes(item.category.toLowerCase()) ||
+          filter.includes(item?.category?.toLowerCase()) ||
           filter.includes(item.seats)
         );
       });
@@ -81,14 +94,8 @@ const Favorites: React.FC = () => {
                 <Cards
                   car={item}
                   key={item.model}
-                  title={item.model}
-                  img={item.img}
-                  amount={item.amount}
-                  autoMaker={item.autoMaker}
-                  seats={item.seats}
-                  gear={item.gear}
+                  favorites={arrayFavorites}
                   width="33.3%"
-                  carFavorite={true}
                 />
               );
             })}
@@ -127,7 +134,41 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
+  const state = store.getState();
+
+  const cars = state.carsSlice.cars;
+  const favorites = state.favoritesSlice.cars;
+  let arrayCars: any = [];
+  let arrayFavorites: any = [];
+
+  const querySnapshot = query(collection(db, "Favorites"));
+  const documents = await getDocs(querySnapshot);
+  documents.forEach((doc) => {
+    arrayFavorites.push({ ...doc.data(), id: doc.id });
+  });
+
+  if (cars.length > 0) {
+    arrayCars = cars;
+  } else {
+    const querySnapshot = query(collection(db, "Favorites"));
+    const documents = await getDocs(querySnapshot);
+    documents.forEach((doc) => {
+      arrayCars.push(doc.data());
+    });
+  }
+
+  const user = {
+    name: session.user?.name,
+    email: session.user?.email,
+    image: session.user?.image,
+    id: session.id,
+  };
+
   return {
-    props: {},
+    props: {
+      user,
+      arrayCars,
+      arrayFavorites,
+    },
   };
 };

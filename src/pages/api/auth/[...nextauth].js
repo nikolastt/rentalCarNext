@@ -9,4 +9,12 @@ export default NextAuth({
     }),
   ],
   secret: process.env.NEXT_SECRET,
+  callbacks: {
+    async session({ session, token }) {
+      return {
+        ...session,
+        id: token.sub,
+      };
+    },
+  },
 });
