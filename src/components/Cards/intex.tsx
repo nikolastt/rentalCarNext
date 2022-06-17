@@ -13,6 +13,8 @@ import {
   SideLeftContentFooter,
   Gears,
   Seats,
+  CardContent,
+  ImageContent,
 } from "./styles";
 import { Skeleton, Stack, useTheme } from "@mui/material";
 import { addFavoriteCar, removeFavoriteCar } from "../../redux/favoriteslice";
@@ -21,6 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addDoc, collection, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase/index";
 import { RootState } from "../../redux/store";
+import Image from "next/image";
 
 interface ICardProps {
   width?: string;
@@ -90,7 +93,7 @@ const Cards: React.FC<ICardProps> = ({
         userId: user?.id,
         id: doc.id,
       };
-      console.log(doc.id, "Id carro cadastrado");
+
       dispatch(addFavoriteCar(data));
       setCarFavorite(data);
     });
@@ -100,13 +103,10 @@ const Cards: React.FC<ICardProps> = ({
     if (!carFavorite?.id) {
       return;
     } else {
-      console.log(carFavorite.id, "Id carro excluir");
       await deleteDoc(doc(db, "Favorites", carFavorite.id)).then((doc) => {
         try {
           dispatch(removeFavoriteCar(car));
-        } catch {
-          console.log("Erro ao retirar veículo do state - store.");
-        }
+        } catch {}
       });
     }
   };
@@ -115,10 +115,8 @@ const Cards: React.FC<ICardProps> = ({
     setIsFavorite((prevState) => {
       if (!prevState) {
         addFavoriteCarBD();
-        console.log("Adicionar Carro");
       } else {
         removeFavoriteCarBD();
-        console.log("Remover Carro");
       }
 
       return !prevState;
@@ -155,7 +153,12 @@ const Cards: React.FC<ICardProps> = ({
               )}
             </ContentHeader>
           </Card.Header>
-          <Card.Img className="cardImg" variant="bottom" src={car.img} />
+          <CardContent>
+            <ImageContent>
+              <Image src={car.img} alt={car.amount} layout="fill" />
+            </ImageContent>
+          </CardContent>
+
           <Card.Footer className="cardFooter">
             <ContentFooter>
               <SideLeftContentFooter>

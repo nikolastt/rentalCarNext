@@ -188,7 +188,7 @@ const ResponsiveAppBar = () => {
               <Button
                 variant="outlined"
                 color="primary"
-                onClick={() => signIn("github")}
+                onClick={() => signIn()}
               >
                 login com
                 <AiFillGithub size={30} style={{ marginLeft: "1rem" }} />

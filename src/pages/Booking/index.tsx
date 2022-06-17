@@ -10,7 +10,7 @@ import { RootState } from "../../redux/store";
 import AppBar from "../../components/AppBar";
 
 import { ICarProps } from "../../redux/carsSlice";
-import { collection, getDocs, query, limit } from "firebase/firestore";
+import { collection, getDocs, query, limit, where } from "firebase/firestore";
 import { db } from "../../firebase";
 
 import Pagination from "@mui/material/Pagination";
@@ -119,6 +119,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
+  const user = {
+    name: session.user?.name,
+    email: session.user?.email,
+    image: session.user?.image,
+    id: session.id,
+  };
+
   const state = store.getState();
 
   const cars = state.carsSlice.cars;
@@ -129,8 +136,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   if (favorites.length > 0) {
     arrayFavorites = favorites;
   } else {
-    const querySnapshot = query(collection(db, "Favorites"));
-    const documents = await getDocs(querySnapshot);
+    const favoritesRef = collection(db, "Favorites");
+    const q = query(favoritesRef, where("userId", "==", user.id));
+    const documents = await getDocs(q);
     documents.forEach((doc) => {
       arrayFavorites.push({ ...doc.data(), id: doc.id });
     });
@@ -145,13 +153,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       arrayCars.push(doc.data());
     });
   }
-
-  const user = {
-    name: session.user?.name,
-    email: session.user?.email,
-    image: session.user?.image,
-    id: session.id,
-  };
 
   return {
     props: {

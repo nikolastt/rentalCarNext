@@ -10,7 +10,7 @@ import { RootState, store } from "../../redux/store";
 import AppBar from "../../components/AppBar";
 
 import { getCars, ICarProps } from "../../redux/carsSlice";
-import { collection, getDocs, query, limit } from "firebase/firestore";
+import { collection, getDocs, query, limit, where } from "firebase/firestore";
 import { db } from "../../firebase";
 
 import Pagination from "@mui/material/Pagination";
@@ -29,15 +29,10 @@ interface IUserProps {
 
 interface IFavorite {
   user: IUserProps;
-  arrayCars: ICarProps[];
   arrayFavorites: IDataProps[];
 }
 
-const Favorites: React.FC<IFavorite> = ({
-  user,
-  arrayCars,
-  arrayFavorites,
-}) => {
+const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
   const [carsInScreen, setCarsInScreen] = useState<ICarProps[]>([]);
   const filter = useSelector((state: RootState) => state.filterByCategory);
   const dispatch = useDispatch();
@@ -47,7 +42,6 @@ const Favorites: React.FC<IFavorite> = ({
     (state: RootState) => state.favoritesSlice.cars
   );
 
-  const cars = favorites;
   useEffect(() => {
     if (!userStore.email) {
       dispatch(setUSer(user));
@@ -60,11 +54,11 @@ const Favorites: React.FC<IFavorite> = ({
     } else {
       dispatch(setFavoriteCars(arrayFavorites));
     }
-  }, [arrayFavorites, dispatch, favorites.length]);
+  }, []);
 
   useEffect(() => {
     function handleCarsInScreen() {
-      const newCars = cars.filter((item) => {
+      const newCars = favorites.filter((item: ICarProps) => {
         return (
           filter.includes(item?.category?.toLowerCase()) ||
           filter.includes(item.seats)
@@ -74,47 +68,49 @@ const Favorites: React.FC<IFavorite> = ({
       setCarsInScreen(newCars);
     }
 
-    handleCarsInScreen();
+    filter.length > 0 ? handleCarsInScreen() : setCarsInScreen(favorites);
+  }, [filter, favorites]);
 
-    {
-      filter.length > 0 ? handleCarsInScreen() : setCarsInScreen(cars);
-    }
-  }, [filter, cars]);
+  console.log(favorites, "Favorites");
 
   return (
     <>
       <AppBar />
       <Container>
-        <SideLeft isTypeFavorite={true} />
-
-        {carsInScreen.length > 0 ? (
-          <Content>
-            {carsInScreen.map((item, index) => {
-              return (
-                <Cards
-                  car={item}
-                  key={item.model}
-                  favorites={arrayFavorites}
-                  width="33.3%"
-                />
-              );
-            })}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                width: "100%",
-                marginTop: "1.5rem",
-              }}
-            >
-              <Pagination count={3} variant="outlined" />
-            </Box>
-          </Content>
-        ) : (
-          <Content>
-            <h1>Carregando</h1>
-          </Content>
-        )}
+        <>
+          {carsInScreen.length > 0 ? (
+            <>
+              <SideLeft isTypeFavorite={true} />
+              <Content>
+                {carsInScreen.map((item, index) => {
+                  return (
+                    <Cards
+                      car={item}
+                      key={item.model}
+                      favorites={arrayFavorites}
+                      width="33.3%"
+                    />
+                  );
+                })}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    width: "100%",
+                    marginTop: "1.5rem",
+                  }}
+                >
+                  <Pagination count={3} variant="outlined" />
+                </Box>
+              </Content>
+            </>
+          ) : (
+            <Content>
+              <h1>Você não tem nenhum carro favoritado</h1>
+            </Content>
+          )}
+          <h1>state : {favorites.length}</h1>
+        </>
       </Container>
     </>
   );
@@ -133,30 +129,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       },
     };
   }
-
-  const state = store.getState();
-
-  const cars = state.carsSlice.cars;
-  const favorites = state.favoritesSlice.cars;
-  let arrayCars: any = [];
-  let arrayFavorites: any = [];
-
-  const querySnapshot = query(collection(db, "Favorites"));
-  const documents = await getDocs(querySnapshot);
-  documents.forEach((doc) => {
-    arrayFavorites.push({ ...doc.data(), id: doc.id });
-  });
-
-  if (cars.length > 0) {
-    arrayCars = cars;
-  } else {
-    const querySnapshot = query(collection(db, "Favorites"));
-    const documents = await getDocs(querySnapshot);
-    documents.forEach((doc) => {
-      arrayCars.push(doc.data());
-    });
-  }
-
   const user = {
     name: session.user?.name,
     email: session.user?.email,
@@ -164,10 +136,25 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     id: session.id,
   };
 
+  const state = store.getState();
+
+  const favorites = state.favoritesSlice.cars;
+  let arrayFavorites: any = [];
+
+  if (favorites.length > 0) {
+    arrayFavorites = favorites;
+  } else {
+    const favoritesRef = collection(db, "Favorites");
+    const q = query(favoritesRef, where("userId", "==", user.id));
+    const documents = await getDocs(q);
+    documents.forEach((doc) => {
+      arrayFavorites.push({ ...doc.data(), id: doc.id });
+    });
+  }
+
   return {
     props: {
       user,
-      arrayCars,
       arrayFavorites,
     },
   };

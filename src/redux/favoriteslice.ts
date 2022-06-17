@@ -29,10 +29,15 @@ export const favoriteSlice = createSlice({
       console.log(state.cars, "state.cars");
     },
     removeFavoriteCar: (state, action) => {
-      const carsFilter = state.cars.filter(
-        (car) => car.model !== action.payload.model
-      );
-      state.cars = carsFilter;
+      if (state.cars.length !== 1) {
+        const carsFilter = state.cars.filter(
+          (car) => car.model !== action.payload.model
+        );
+        state.cars = carsFilter;
+      } else {
+        console.log("Caiu no ultimo carro");
+        state.cars = [];
+      }
     },
   },
 });
