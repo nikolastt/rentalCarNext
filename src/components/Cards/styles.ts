@@ -4,6 +4,10 @@ interface IContainerProps {
   width?: string;
 }
 
+interface IIconHeaderFavoriteContent {
+  typeCursor?: string;
+}
+
 export const Container = styled.div<IContainerProps>`
   width: ${(props) => props.width};
   height: 250px;
@@ -44,6 +48,10 @@ export const Container = styled.div<IContainerProps>`
   .cardTitle {
     color: ${(props) => props.theme.colors.white};
   }
+
+  .css-1tbm5ru-MuiButtonBase-root-MuiButton-root-MuiLoadingButton-root:hover {
+    background-color: transparent;
+  }
 `;
 
 export const CardHeader = styled.div`
@@ -58,9 +66,10 @@ export const ContentHeader = styled.div`
   display: flex;
 `;
 
-export const IconHeaderFavoriteContainer = styled.div`
+export const IconHeaderFavoriteContainer = styled.div<IIconHeaderFavoriteContent>`
   margin-left: auto;
-  cursor: pointer;
+
+  cursor: ${(props) => (props.typeCursor ? props.typeCursor : "pointer")};
 `;
 
 export const SideLeftContentFooter = styled.div`

@@ -77,40 +77,37 @@ const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
     <>
       <AppBar />
       <Container>
-        <>
-          {carsInScreen.length > 0 ? (
-            <>
-              <SideLeft isTypeFavorite={true} />
-              <Content>
-                {carsInScreen.map((item, index) => {
-                  return (
-                    <Cards
-                      car={item}
-                      key={item.model}
-                      favorites={arrayFavorites}
-                      width="33.3%"
-                    />
-                  );
-                })}
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    width: "100%",
-                    marginTop: "1.5rem",
-                  }}
-                >
-                  <Pagination count={3} variant="outlined" />
-                </Box>
-              </Content>
-            </>
-          ) : (
+        {carsInScreen.length > 0 ? (
+          <>
+            <SideLeft isTypeFavorite={true} />
             <Content>
-              <h1>Você não tem nenhum carro favoritado</h1>
+              {carsInScreen.map((item, index) => {
+                return (
+                  <Cards
+                    car={item}
+                    key={item.model}
+                    favorites={arrayFavorites}
+                    width="33.3%"
+                  />
+                );
+              })}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%",
+                  marginTop: "1.5rem",
+                }}
+              >
+                <Pagination count={3} variant="outlined" />
+              </Box>
             </Content>
-          )}
-          <h1>state : {favorites.length}</h1>
-        </>
+          </>
+        ) : (
+          <Content>
+            <h1>Você não tem nenhum carro favoritado</h1>
+          </Content>
+        )}
       </Container>
     </>
   );

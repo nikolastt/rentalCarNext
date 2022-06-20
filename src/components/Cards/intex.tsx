@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Card } from "react-bootstrap";
+import { Card, Spinner } from "react-bootstrap";
 import { FaUser } from "react-icons/fa";
 import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
 import { GiGearStickPattern } from "react-icons/gi";
+
+import "bootstrap/dist/css/bootstrap.min.css";
 
 import {
   Container,
@@ -59,6 +61,8 @@ const Cards: React.FC<ICardProps> = ({
   const [carFavorite, setCarFavorite] = useState<IDataProps>();
   const dispatch = useDispatch();
 
+  const [isLoadingAddFavorites, setisLoadingAddFavorites] = useState(false);
+
   useEffect(() => {
     favorites?.map((carDb) => {
       if (carDb.model.toLowerCase() === car.model.toLowerCase()) {
@@ -69,6 +73,7 @@ const Cards: React.FC<ICardProps> = ({
   }, [car.model, favorites]);
 
   const addFavoriteCarBD = async () => {
+    setisLoadingAddFavorites(true);
     const ref = collection(db, "Favorites");
     await addDoc(ref, {
       model: car.model,
@@ -96,6 +101,7 @@ const Cards: React.FC<ICardProps> = ({
 
       dispatch(addFavoriteCar(data));
       setCarFavorite(data);
+      setisLoadingAddFavorites(false);
     });
   };
 
@@ -106,21 +112,27 @@ const Cards: React.FC<ICardProps> = ({
       await deleteDoc(doc(db, "Favorites", carFavorite.id)).then((doc) => {
         try {
           dispatch(removeFavoriteCar(car));
+          setisLoadingAddFavorites(false);
         } catch {}
       });
     }
   };
 
   const handleIcon = () => {
-    setIsFavorite((prevState) => {
-      if (!prevState) {
-        addFavoriteCarBD();
-      } else {
-        removeFavoriteCarBD();
-      }
+    if (!isLoadingAddFavorites) {
+      setisLoadingAddFavorites(true);
+      setIsFavorite((prevState) => {
+        if (!prevState) {
+          addFavoriteCarBD();
+        } else {
+          removeFavoriteCarBD();
+        }
 
-      return !prevState;
-    });
+        return !prevState;
+      });
+    } else {
+      console.log("Não Fez");
+    }
   };
 
   return (
@@ -142,7 +154,13 @@ const Cards: React.FC<ICardProps> = ({
                 {car.autoMaker + " "}
                 {car.model}
               </Card.Title>
-              {isTypeFavorite ?? (
+              {isTypeFavorite ?? isLoadingAddFavorites ? (
+                <IconHeaderFavoriteContainer
+                  typeCursor={isLoadingAddFavorites ? "not-allowed" : "Pointer"}
+                >
+                  <Spinner animation="border" variant="secondary" size="sm" />
+                </IconHeaderFavoriteContainer>
+              ) : (
                 <IconHeaderFavoriteContainer onClick={handleIcon}>
                   {isFavorite ? (
                     <MdFavorite size={20} color="red" />
