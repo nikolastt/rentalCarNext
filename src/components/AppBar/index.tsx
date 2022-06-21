@@ -18,6 +18,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { AiFillGithub } from "react-icons/ai";
 import { GetStaticProps } from "next";
 import { Router, useRouter } from "next/router";
+import checkSession from "../../pages/api/session";
 
 const pages = [
   { name: "Home", path: "/" },
@@ -56,15 +57,14 @@ const ResponsiveAppBar = () => {
   const manageSettingsOptions = (option: string) => {
     if (option === "Sair") {
       handleCloseUserMenu();
-      router.push(`/PageServices`);
       signOut();
+      router.push(`/api/session`);
     }
 
     if (option === "Perfil") {
       handleCloseUserMenu();
       //console.log("dbugggd")
-
-      router.push(`/Profile`);
+      router.push(`/api/session`);
     }
   };
 

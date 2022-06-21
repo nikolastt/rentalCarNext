@@ -6,10 +6,8 @@ import IconInformation from "../../components/IconInformation"
 import { ContentSectionAdvantage, PageHeader, SectionAdvantage, TitleSectionAdvantage } from "../../stylePages/stylesPageServices"
 
 export default function UserProfile() {
-    const router = useRouter()
-    const { data: session } = useSession()
+    //const router = useRouter()
     
-    if (session) {
         return (
             <>    
                 <AppBar />    
@@ -42,6 +40,6 @@ export default function UserProfile() {
                 </SectionAdvantage>
             </>
         )
-    }
 }
+
 
