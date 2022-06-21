@@ -17,6 +17,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 import { AiFillGithub } from "react-icons/ai";
 import { GetStaticProps } from "next";
+import { Router, useRouter } from "next/router";
 
 const pages = [
   { name: "Home", path: "/" },
@@ -24,9 +25,12 @@ const pages = [
   { name: "Meus Favoritos", path: "/Favorites" },
   { name: "Adicionar Veículo", path: "/AddVeicle" },
 ];
-const settings = ["Perfil", "Account", "Dashboard", "Sair"];
+const settings = ["Perfil", "Sair"];
+
 
 const ResponsiveAppBar = () => {
+  const router = useRouter()
+
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -52,7 +56,15 @@ const ResponsiveAppBar = () => {
   const manageSettingsOptions = (option: string) => {
     if (option === "Sair") {
       handleCloseUserMenu();
+      router.push(`/PageServices`);
       signOut();
+    }
+
+    if (option === "Perfil") {
+      handleCloseUserMenu();
+      //console.log("dbugggd")
+
+      router.push(`/Profile`);
     }
   };
 
@@ -88,7 +100,7 @@ const ResponsiveAppBar = () => {
               },
             }}
           >
-            Perfect Wheels
+            10Loca
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -226,4 +238,5 @@ const ResponsiveAppBar = () => {
     </AppBar>
   );
 };
+
 export default ResponsiveAppBar;
