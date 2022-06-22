@@ -18,7 +18,6 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { AiFillGithub } from "react-icons/ai";
 import { GetStaticProps } from "next";
 import { Router, useRouter } from "next/router";
-import checkSession from "../../pages/api/session";
 
 const pages = [
   { name: "Home", path: "/" },
