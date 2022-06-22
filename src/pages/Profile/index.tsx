@@ -2,18 +2,28 @@ import { useSession, signIn, signOut } from "next-auth/react"
 import { useRouter } from "next/router"
 import Script from "next/script"
 import AppBar from "../../components/AppBar"
+import Dashboard from "../../components/Dashboard"
 import IconInformation from "../../components/IconInformation"
 import { ContentSectionAdvantage, PageHeader, SectionAdvantage, TitleSectionAdvantage } from "../../stylePages/stylesPageServices"
 
+
 export default function UserProfile() {
-    //const router = useRouter()
-    
+
+        const session = useSession();
+
+        if (session.data != null){
         return (
             <>    
+            
                 <AppBar />    
                 <PageHeader>
                     
                 </PageHeader>
+
+                {/* Aqui vai o dashboard */}
+                <div>
+                    <Dashboard></Dashboard>
+                </div>
 
 
                 <SectionAdvantage>
@@ -40,6 +50,14 @@ export default function UserProfile() {
                 </SectionAdvantage>
             </>
         )
+        } else {
+            return (
+                <>
+                <AppBar /> 
+                <h1>Você não está logado.</h1>
+                </>
+            )
+        }
 }
 
 
