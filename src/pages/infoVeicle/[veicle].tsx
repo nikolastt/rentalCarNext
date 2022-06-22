@@ -82,18 +82,30 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car }) => {
   const reservVeicle = async () => {
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      handleClick(
-        {
-          vertical: "top",
-          horizontal: "right",
-        },
-        { openSuccess: true }
-      );
-    }, 2000);
-
-    setTimeout(() => {
+    const ref = collection(db, "RentedCars");
+    try {
+      await addDoc(ref, {
+        model: car.model,
+        autoMaker: car.autoMaker,
+        amount: car.amount,
+        typeFuel: car.typeFuel,
+        category: car.category,
+        img: car.img,
+        seats: car.seats,
+        gear: car.gear,
+        userId: user?.id,
+        extras: [extra1, extra2],
+      }).then(() => {
+        setIsLoading(false);
+        handleClick(
+          {
+            vertical: "top",
+            horizontal: "right",
+          },
+          { openSuccess: true }
+        );
+      });
+    } catch {
       setIsLoading(false);
       handleClick(
         {
@@ -102,24 +114,7 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car }) => {
         },
         { openError: true }
       );
-    }, 10000);
-
-    // const ref = collection(db, "RentedVeicles");
-    // await addDoc(ref, {
-    //   model: car.model,
-    //   autoMaker: car.autoMaker,
-    //   amount: car.amount,
-    //   typeFuel: car.typeFuel,
-    //   category: car.category,
-    //   img: car.img,
-    //   seats: car.seats,
-    //   gear: car.gear,
-    //   userId: user?.id,
-    //   extras: [extra1, extra2],
-    // }).then(() => {
-    //   setIsLoading(false);
-    //   handleClick();
-    // });
+    }
   };
 
   const handleExtra1 = () => {

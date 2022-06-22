@@ -25,11 +25,10 @@ const pages = [
   { name: "Meus Favoritos", path: "/Favorites" },
   { name: "Adicionar Veículo", path: "/AddVeicle" },
 ];
-const settings = ["Perfil", "Sair"];
-
+const settings = ["Perfil", "Carros alugados", "Sair"];
 
 const ResponsiveAppBar = () => {
-  const router = useRouter()
+  const router = useRouter();
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
@@ -57,13 +56,16 @@ const ResponsiveAppBar = () => {
     if (option === "Sair") {
       handleCloseUserMenu();
       signOut();
-      router.push(`/api/session`);
     }
 
     if (option === "Perfil") {
       handleCloseUserMenu();
-      //console.log("dbugggd")
-      router.push(`/api/session`);
+      router.push(`/Profile`);
+    }
+
+    if (option === "Carros alugados") {
+      handleCloseUserMenu();
+      router.push(`/RentedCars`);
     }
   };
 
@@ -190,7 +192,7 @@ const ResponsiveAppBar = () => {
               <Tooltip title="Abrir configurações do perfil">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar
-                    alt="Nikolas Bitencourt"
+                    alt={session?.user?.name?.toString()}
                     src={session.user?.image?.toString()}
                   />
                 </IconButton>
