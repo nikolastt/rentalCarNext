@@ -17,11 +17,11 @@ export default function Dashboard() {
 
     const { data: session } = useSession();
 
-    const q = query(collection(db, "personal_info"));
 
-    const querySnapshot = getDocs(q);
+    //const q = query(collection(db, "personal_info"));
+    //const querySnapshot = getDocs(q);
+    
 
-    //console.log(doc.id, " => ", doc.data());
     return (
         <>
         <Avatar 
@@ -29,11 +29,14 @@ export default function Dashboard() {
             src={session.user?.image?.toString()}
         />
         <Card className="card">
-
+        <Card.Text>
+          
+        </Card.Text>
         </Card>
         </>
     )
 }
+
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     const session = await getSession({ req });
