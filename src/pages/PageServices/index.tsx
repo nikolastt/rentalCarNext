@@ -47,7 +47,7 @@ const PageServices: React.FC = () => {
       const arrayCars: any = [];
       const querySnapshot = await getDocs(collection(db, "cars"));
       querySnapshot.forEach((doc) => {
-        arrayCars.push(doc.data());
+        arrayCars.push({ ...doc.data(), id: doc.id });
       });
       setCars(arrayCars);
       dispatch(getCars(arrayCars));

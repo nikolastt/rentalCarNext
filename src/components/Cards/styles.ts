@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 interface IContainerProps {
   width?: string;
+  primaryColor: string;
 }
 
 interface IIconHeaderFavoriteContent {
@@ -19,11 +20,14 @@ export const Container = styled.div<IContainerProps>`
     border-radius: 1.5rem;
     border: none;
     overflow: hidden;
-    border: 1px solid ${(props) => props.theme.colors.info};
+    border: 1px solid ${(props) => props.primaryColor};
 
-    background-image: linear-gradient(120deg, #101010 0%, #ee7116 100%);
+    background-image: linear-gradient(
+      120deg,
+      #101010 10%,
+      ${(props) => props.primaryColor} 1000%
+    );
 
-    background: rgba(238, 113, 22, 0.05);
     border-radius: 16px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 1);
     backdrop-filter: blur(2px);

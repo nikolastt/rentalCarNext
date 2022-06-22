@@ -147,12 +147,18 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   if (cars.length > 0) {
     arrayCars = cars;
   } else {
-    const querySnapshot = query(collection(db, "cars"));
-    const documents = await getDocs(querySnapshot);
-    documents.forEach((doc) => {
-      arrayCars.push(doc.data());
+    const querySnapshot = await getDocs(collection(db, "cars"));
+
+    arrayCars = querySnapshot.docs.map((doc) => {
+      console.log(doc.id, doc.data());
+      return {
+        id: doc.id,
+        ...doc.data(),
+      };
     });
   }
+
+  console.log(arrayCars);
 
   return {
     props: {
