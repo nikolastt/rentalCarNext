@@ -41,6 +41,7 @@ interface IUserProps {
 interface IInforVeicles {
   user: IUserProps;
   car: ICarProps;
+  id: String;
 }
 
 export interface State extends SnackbarOrigin {
@@ -49,7 +50,7 @@ export interface State extends SnackbarOrigin {
   open: boolean;
 }
 
-const InfoVeicle: React.FC<IInforVeicles> = ({ user, car }) => {
+const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
   const [extra1, setExtra1] = useState(0);
   const [extra2, setExtra2] = useState(0);
 
@@ -95,6 +96,7 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car }) => {
         gear: car.gear,
         userId: user?.id,
         extras: [extra1, extra2],
+        id,
       }).then(() => {
         setIsLoading(false);
         handleClick(
@@ -255,6 +257,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     props: {
       user,
       car,
+      id,
     },
   };
 };

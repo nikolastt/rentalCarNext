@@ -1,6 +1,8 @@
+import { Button } from "@mui/material";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
+import Link from "next/link";
 import * as React from "react";
 import ResponsiveAppBar from "../../components/AppBar";
 import Cards from "../../components/Cards/intex";
@@ -17,7 +19,17 @@ const RentedCars: React.FC<IRentedCars> = ({ arrayRentedCars }) => {
       <ResponsiveAppBar />
 
       {arrayRentedCars.map((car) => (
-        <Cards car={car} key={car.model} width="100%" isTypeFavorite={false} />
+        <>
+          <Cards
+            car={car}
+            key={car.model}
+            width="100%"
+            isTypeFavorite={false}
+          />
+          <Button variant="outlined">
+            <Link href={`/infoVeicle/${car.id}`}>Alugar novamente</Link>
+          </Button>
+        </>
       ))}
     </>
   );
