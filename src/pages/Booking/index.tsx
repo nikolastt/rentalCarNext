@@ -150,15 +150,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     const querySnapshot = await getDocs(collection(db, "cars"));
 
     arrayCars = querySnapshot.docs.map((doc) => {
-      console.log(doc.id, doc.data());
       return {
         id: doc.id,
         ...doc.data(),
       };
     });
   }
-
-  console.log(arrayCars);
 
   return {
     props: {

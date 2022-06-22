@@ -1,3 +1,4 @@
+import React from "react";
 import { GetServerSideProps } from "next";
 import { useSession, getSession } from "next-auth/react";
 import AppBar from "../../components/AppBar";
@@ -20,7 +21,9 @@ export default function UserProfile() {
         <PageHeader></PageHeader>
 
         {/* Aqui vai o dashboard */}
-        <div>{/* <Dashboard /> */}</div>
+        <div>
+          <Dashboard />
+        </div>
 
         <SectionAdvantage>
           <TitleSectionAdvantage>Nossas Vantagens</TitleSectionAdvantage>

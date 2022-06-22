@@ -71,8 +71,6 @@ const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
     filter.length > 0 ? handleCarsInScreen() : setCarsInScreen(favorites);
   }, [filter, favorites]);
 
-  console.log(favorites, "Favorites");
-
   return (
     <>
       <AppBar />
@@ -126,6 +124,16 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       },
     };
   }
+
+  if (session.user?.email !== "nikolasbitencourtt@gmail.com") {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
   const user = {
     name: session.user?.name,
     email: session.user?.email,

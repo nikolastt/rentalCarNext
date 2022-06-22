@@ -6,16 +6,22 @@ import { Card } from "react-bootstrap";
 import { db } from "../../firebase";
 import { CardContent, ContentHeader } from "../Cards/styles";
 
-export default async function Dashboard() {
+// import { Container } from "./styles";
+
+const Dashboard: React.FC = () => {
   const { data: session } = useSession();
 
-  const personalRef = collection(db, "personal_info");
-  const q = query(personalRef);
+  const getPerfil = async () => {
+    const personalRef = collection(db, "personal_info");
+    const q = query(personalRef);
 
-  const querySnapshot = await getDocs(q);
-  querySnapshot.forEach((doc) => {
-    console.log(doc.id, " => ", doc.data());
-  });
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id, " => ", doc.data());
+    });
+  };
+
+  getPerfil();
 
   return (
     <>
@@ -28,30 +34,6 @@ export default async function Dashboard() {
       </Card>
     </>
   );
-}
-
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const session = await getSession({ req });
-
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/notlogin",
-        permanent: false,
-      },
-    };
-  }
-
-  const user = {
-    name: session.user?.name,
-    email: session.user?.email,
-    image: session.user?.image,
-    id: session.id,
-  };
-
-  return {
-    props: {
-      user,
-    },
-  };
 };
+
+export default Dashboard;

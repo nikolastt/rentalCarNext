@@ -6,6 +6,8 @@ import {
   FormControlLabel,
   Snackbar,
   SnackbarOrigin,
+  Stack,
+  TextField,
 } from "@mui/material";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { GetServerSideProps } from "next";
@@ -14,6 +16,7 @@ import Image from "next/image";
 import ResponsiveAppBar from "../../components/AppBar";
 import { db } from "../../firebase";
 import { ICarProps } from "../../redux/carsSlice";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 import {
   Container,
@@ -26,8 +29,13 @@ import {
   Title,
   FooterTitle,
   ContainerImage,
+  DatesContainer,
 } from "../../stylePages/stylesInfoVeicle";
-import { LoadingButton } from "@mui/lab";
+import {
+  LoadingButton,
+  LocalizationProvider,
+  MobileDatePicker,
+} from "@mui/lab";
 
 import { useTheme } from "@mui/material";
 
@@ -66,6 +74,16 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
     horizontal: "right",
   });
 
+  const ref = collection(db, "RentedCars");
+
+  const [value, setValue] = React.useState<Date | null>(
+    new Date("2014-08-18T21:11:54")
+  );
+
+  const handleChange = (newValue: Date | null) => {
+    setValue(newValue);
+  };
+
   const { vertical, horizontal, openSuccess, openError, open } = state;
 
   const handleClose = () => {
@@ -83,7 +101,6 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
   const reservVeicle = async () => {
     setIsLoading(true);
 
-    const ref = collection(db, "RentedCars");
     try {
       await addDoc(ref, {
         model: car.model,
@@ -170,6 +187,28 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
               label="Vidros Escuros + RS75,00"
             />
           </CheckBoxArea>
+
+          <DatesContainer>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <Stack spacing={3}>
+                <MobileDatePicker
+                  label="Data da locação"
+                  inputFormat="MM/dd/yyyy"
+                  value={value}
+                  onChange={handleChange}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+
+                <MobileDatePicker
+                  label="Data da devolução"
+                  inputFormat="MM/dd/yyyy"
+                  value={value}
+                  onChange={handleChange}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </Stack>
+            </LocalizationProvider>
+          </DatesContainer>
 
           <Footer>
             <FooterTitle>

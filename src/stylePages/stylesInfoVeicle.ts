@@ -60,7 +60,11 @@ export const SizeImage = styled.div`
 export const CheckBoxArea = styled.div`
   display: flex;
   flex-direction: column;
-  height: 70%;
+  height: 25%;
+`;
+
+export const DatesContainer = styled.div`
+  height: 35%;
 `;
 
 export const Footer = styled.div`

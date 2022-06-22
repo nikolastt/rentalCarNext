@@ -85,7 +85,6 @@ const Cards: React.FC<ICardProps> = ({
       gear: car.gear,
       userId: user?.id,
     }).then((doc) => {
-      console.log("Adicionou");
       let data = {
         model: car.model,
         autoMaker: car.autoMaker,
