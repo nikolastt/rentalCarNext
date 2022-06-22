@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface ICarProps {
-  id: string;
+  id?: string;
   model: string;
   autoMaker: string;
   amount: string;
