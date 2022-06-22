@@ -6,61 +6,52 @@ import { Card } from "react-bootstrap";
 import { db } from "../../firebase";
 import { CardContent, ContentHeader } from "../Cards/styles";
 
-// sx
+export default async function Dashboard() {
+  const { data: session } = useSession();
 
-interface ICardProps {
-    width?: string;
-  }
+  const personalRef = collection(db, "personal_info");
+  const q = query(personalRef);
 
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    console.log(doc.id, " => ", doc.data());
+  });
 
-export default function Dashboard() {
-
-    const { data: session } = useSession();
-
-
-    //const q = query(collection(db, "personal_info"));
-    //const querySnapshot = getDocs(q);
-    
-
-    return (
-        <>
-        <Avatar 
-            sx={{width: 220, height: 220}}
-            src={session.user?.image?.toString()}
-        />
-        <Card className="card">
-        <Card.Text>
-          
-        </Card.Text>
-        </Card>
-        </>
-    )
+  return (
+    <>
+      <Avatar
+        sx={{ width: 220, height: 220 }}
+        src={session?.user?.image?.toString()}
+      />
+      <Card className="card">
+        <Card.Text></Card.Text>
+      </Card>
+    </>
+  );
 }
 
-
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-    const session = await getSession({ req });
-  
-    if (!session) {
-      return {
-        redirect: {
-          destination: "/notlogin",
-          permanent: false,
-        },
-      };
-    }
-  
-    const user = {
-      name: session.user?.name,
-      email: session.user?.email,
-      image: session.user?.image,
-      id: session.id,
-    };
+  const session = await getSession({ req });
 
+  if (!session) {
     return {
-        props: {
-          user
-        },
-      };
+      redirect: {
+        destination: "/notlogin",
+        permanent: false,
+      },
+    };
+  }
+
+  const user = {
+    name: session.user?.name,
+    email: session.user?.email,
+    image: session.user?.image,
+    id: session.id,
+  };
+
+  return {
+    props: {
+      user,
+    },
+  };
 };
-  
