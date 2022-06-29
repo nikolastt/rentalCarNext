@@ -24,13 +24,14 @@ import {
 import { db } from "../../firebase";
 
 import Pagination from "@mui/material/Pagination";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { GetServerSideProps, GetStaticProps } from "next";
 import { getSession } from "next-auth/react";
 import { setUSer } from "../../redux/userSlice";
 
 import { store } from "../../redux/store";
 import { ICarProps } from "../../redux/carsSlice";
+import { LoadingButton } from "@mui/lab";
 
 interface IUserProps {
   name: string;
@@ -52,11 +53,10 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
   const filter = useSelector((state: RootState) => state.filterByCategory);
   const [cars, setCars] = useState<ICarProps[]>(arrayCars);
   const dispatch = useDispatch();
-  const [page, setPage] = React.useState(1);
+  const [noMoreCars, setnoMoreCars] = React.useState(false);
   const [pages, setPages] = React.useState(0);
   const [lastVisible, setLastVisible] = useState<any>();
-
-  console.log(cars);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const getFirsLastVisible = async () => {
@@ -71,18 +71,18 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
     getFirsLastVisible();
   }, []);
 
-  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    if (cars.length / 6 < value) {
-      const getMoreCars = async () => {
-        const queryGetCars = query(
-          collection(db, "cars"),
-          orderBy("autoMaker"),
-          startAfter(lastVisible),
-          limit(6)
-        );
-        let mock: any = [];
-        const documentSnapshots = await getDocs(queryGetCars);
-        console.log(documentSnapshots);
+  const handleChange = () => {
+    setLoading(true);
+    const getMoreCars = async () => {
+      const queryGetCars = query(
+        collection(db, "cars"),
+        orderBy("autoMaker"),
+        startAfter(lastVisible),
+        limit(6)
+      );
+      let mock: any = [];
+      const documentSnapshots = await getDocs(queryGetCars);
+      if (documentSnapshots.docs.length > 0) {
         documentSnapshots.forEach((doc) => {
           mock.push({ ...doc.data(), id: doc.id });
         });
@@ -91,13 +91,17 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
         setLastVisible(
           documentSnapshots.docs[documentSnapshots.docs.length - 1]
         );
-      };
+        setLoading(false);
+      } else {
+        setnoMoreCars(true);
+        setLoading(false);
+      }
+    };
+    if (lastVisible !== undefined) {
       getMoreCars();
     } else {
-      console.log("Não faz requisuição");
+      setnoMoreCars(true);
     }
-
-    setPage(value);
   };
 
   const userStore = useSelector((state: RootState) => state.userSlice.user);
@@ -139,8 +143,6 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
       <Container>
         <SideLeft isTypeFavorite={false} />
 
-        <h1>Page: {page}</h1>
-
         {carsInScreen.length > 0 ? (
           <Content>
             {carsInScreen.map((item, index) => {
@@ -161,11 +163,15 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
                 marginTop: "1.5rem",
               }}
             >
-              <Pagination
-                count={Math.ceil(pages / 6)}
-                onChange={handleChange}
+              <LoadingButton
+                loading={loading}
+                loadingPosition="start"
                 variant="outlined"
-              />
+                onClick={() => handleChange()}
+                disabled={noMoreCars ? true : false}
+              >
+                {noMoreCars ? "NÃO HÁ MAIS CARROS" : "CARREGAR MAIS CARROS"}
+              </LoadingButton>
             </Box>
           </Content>
         ) : (
