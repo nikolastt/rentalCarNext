@@ -73,6 +73,7 @@ const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
 
   console.log(favorites, "Favorites");
 
+  
   return (
     <>
       <AppBar />
