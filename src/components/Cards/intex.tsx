@@ -144,7 +144,7 @@ const Cards: React.FC<ICardProps> = ({
         <Card className="card">
           <Card.Header className="cardHeader">
             <ContentHeader>
-              <Link href={`/infoVeicle/${car.id}`} passHref>
+              <Link href={user ? `/infoVeicle/${car.id}` : "/noLogin"} passHref>
                 <Card.Title style={{ cursor: "pointer" }} className="cardTitle">
                   {car.autoMaker + " "}
                   {car.model}
