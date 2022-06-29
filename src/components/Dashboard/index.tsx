@@ -8,6 +8,7 @@ import { CardContent, ContentHeader, ImageContent } from "../Cards/styles";
 // Icons
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 
 
 //import * as React from "react";
@@ -185,12 +186,16 @@ const Dashboard: React.FC = () => {
   const [ lastRentedMaker, setLastRentedMaker] = useState<string>();
   const [ lastRentedModel, setLastRentedModel] = useState<string>();
   const [ lastRentedImg, setLastRentedImg] = useState<string>();
+  const [ lastRentedId, setLastRentedId] = useState<string>();
+  const [ lastRentedPrice, setLastRentedPrice] = useState<string>();
 
   const getLastRent = async () => {
     const q = query(collection(db, "RentedCars"));
     let lastRentedMaker;
     let lastRentedModel;
     let lastRentedImg;
+    let lastRentedId;
+    let lastRentedPrice;
 
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
@@ -199,11 +204,15 @@ const Dashboard: React.FC = () => {
         lastRentedMaker = doc.data().autoMaker
         lastRentedModel = doc.data().model
         lastRentedImg = doc.data().img
+        lastRentedId = doc.data().id
+        lastRentedPrice = doc.data().amount
       }
     });
     setLastRentedMaker(lastRentedMaker)
     setLastRentedModel(lastRentedModel)
     setLastRentedImg(lastRentedImg)
+    setLastRentedId(lastRentedId)
+    setLastRentedPrice(lastRentedPrice)
   }
 
 
@@ -211,7 +220,7 @@ const Dashboard: React.FC = () => {
   getLastRent();
   getfavCount();
 
-  //getPerfil();
+  // Editar telefone e localização
   
 
 // Expand 
@@ -224,8 +233,8 @@ const Dashboard: React.FC = () => {
     <>
       <Container>
 
-      <Grid container spacing={2}>
-      <Grid item xs={6}>
+      <Grid container spacing={6}>
+      <Grid item xs={3}>
         <Avatar
           sx={{ width: 220, height: 220 }}
           src={session?.user?.image?.toString()}
@@ -258,7 +267,7 @@ const Dashboard: React.FC = () => {
       </Grid>
 
       <Grid item xs={3}>
-        <Card >
+        <Card>
         <CardHeader
         // Nome do carro
           title={`Quantidade de carros alugados: ${rentCount}`}
@@ -267,7 +276,7 @@ const Dashboard: React.FC = () => {
           
         />
             <IconButton edge="end" aria-label="edit" >
-              <EditIcon/>
+              <DoubleArrowIcon/>
             </IconButton>
         </Card>
 
@@ -281,27 +290,23 @@ const Dashboard: React.FC = () => {
         <List>
           <ListItem>
             <ListItemText primary="Nome" secondary={`${session?.user?.name}`} />
-            <IconButton edge="end" aria-label="edit">
-              <EditIcon/>
-            </IconButton>
+
           </ListItem>
           <Divider />
           <ListItem>
             <ListItemText primary="Email" secondary={`${session?.user?.email}`} />
+
+          </ListItem>
+          <Divider />
+          <ListItem>
+            <ListItemText primary="Telefone" secondary={""} />
             <IconButton edge="end" aria-label="edit" >
               <EditIcon/>
             </IconButton>
           </ListItem>
           <Divider />
           <ListItem>
-            <ListItemText primary="Telefone" secondary={"getEmail()"} />
-            <IconButton edge="end" aria-label="edit" >
-              <EditIcon/>
-            </IconButton>
-          </ListItem>
-          <Divider />
-          <ListItem>
-            <ListItemText primary="Localização" secondary={"getEmail()"} />
+            <ListItemText primary="Localização" secondary={""} />
             <IconButton edge="end" aria-label="edit" >
               <EditIcon/>
             </IconButton>
@@ -317,7 +322,7 @@ const Dashboard: React.FC = () => {
       // Nome do carro
         title={lastRentedMaker + " " + lastRentedModel}
       // Informação adicional
-        subheader="September 14, 2016"
+        subheader={`Preço: ${lastRentedPrice}`}
       />
 
         {/* Imagem dos carros aqui */}
@@ -342,16 +347,14 @@ const Dashboard: React.FC = () => {
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           <Typography paragraph>
-            Heat 1/2 cup of the broth in a pot until simmering, add saffron and set
-            aside for 10 minutes.
+            Para mais informações: 
+
+            <IconButton edge="end" aria-label="edit" href={`/infoVeicle/` + lastRentedId} >
+              <DoubleArrowIcon/>
+            </IconButton>
           </Typography>
           <Typography paragraph>
-            Add rice and stir very gently to distribute. Top with artichokes and
-            peppers, and cook without stirring, until most of the liquid is absorbed,
-            15 to 18 minutes. Reduce heat to medium-low, add reserved shrimp and
-            mussels, tucking them down into the rice, and cook again without
-            stirring, until mussels have opened and rice is just tender, 5 to 7
-            minutes more. (Discard any mussels that don&apos;t open.)
+            
           </Typography>
           
         </CardContent>
