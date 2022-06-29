@@ -163,7 +163,6 @@ const AddVeicle: React.FC = () => {
         setGear("");
       })
       .catch(() => {
-        console.log("Entrou no catch");
         setErrorInputInDataBase(true);
         setLoading(false);
       });

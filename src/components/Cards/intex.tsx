@@ -85,7 +85,6 @@ const Cards: React.FC<ICardProps> = ({
       gear: car.gear,
       userId: user?.id,
     }).then((doc) => {
-      console.log("Adicionou");
       let data = {
         model: car.model,
         autoMaker: car.autoMaker,
@@ -145,7 +144,7 @@ const Cards: React.FC<ICardProps> = ({
         <Card className="card">
           <Card.Header className="cardHeader">
             <ContentHeader>
-              <Link href={`/infoVeicle/${car.id}`} passHref>
+              <Link href={user ? `/infoVeicle/${car.id}` : "/noLogin"} passHref>
                 <Card.Title style={{ cursor: "pointer" }} className="cardTitle">
                   {car.autoMaker + " "}
                   {car.model}

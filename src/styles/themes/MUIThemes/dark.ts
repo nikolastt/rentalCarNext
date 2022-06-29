@@ -7,7 +7,7 @@ const darkThemeMUI = createTheme({
     mode: "dark",
 
     primary: {
-      main: "#EE7116",
+      main: "#dd7116",
       light: "#F49D4E",
       dark: "#AB3C0B",
       contrastText: "#ffffffff",

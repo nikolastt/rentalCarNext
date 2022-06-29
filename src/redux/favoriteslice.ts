@@ -26,7 +26,6 @@ export const favoriteSlice = createSlice({
     },
     addFavoriteCar: (state, action) => {
       state.cars = [...state.cars, action.payload];
-      console.log(state.cars, "state.cars");
     },
     removeFavoriteCar: (state, action) => {
       if (state.cars.length !== 1) {
@@ -35,7 +34,6 @@ export const favoriteSlice = createSlice({
         );
         state.cars = carsFilter;
       } else {
-        console.log("Caiu no ultimo carro");
         state.cars = [];
       }
     },

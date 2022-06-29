@@ -8,18 +8,29 @@ import SideLeft from "../../components/SideLeft";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../redux/store";
 import AppBar from "../../components/AppBar";
-
-import { ICarProps } from "../../redux/carsSlice";
-import { collection, getDocs, query, limit, where } from "firebase/firestore";
+// import { ICarProps } from "../../redux/carsSlice";
+import {
+  collection,
+  getDocs,
+  query,
+  limit,
+  where,
+  orderBy,
+  startAt,
+  startAfter,
+  QuerySnapshot,
+  DocumentData,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 
 import Pagination from "@mui/material/Pagination";
 import { Box } from "@mui/material";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, GetStaticProps } from "next";
 import { getSession } from "next-auth/react";
 import { setUSer } from "../../redux/userSlice";
 
 import { store } from "../../redux/store";
+import { ICarProps } from "../../redux/carsSlice";
 
 interface IUserProps {
   name: string;
@@ -32,13 +43,62 @@ interface IBooking {
   user: IUserProps;
   arrayCars: ICarProps[];
   arrayFavorites: IDataProps[];
+  lastVisible: any;
+  totalCars: number;
 }
 
 const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
   const [carsInScreen, setCarsInScreen] = useState<ICarProps[]>([]);
   const filter = useSelector((state: RootState) => state.filterByCategory);
+  const [cars, setCars] = useState<ICarProps[]>(arrayCars);
   const dispatch = useDispatch();
-  const cars = arrayCars;
+  const [page, setPage] = React.useState(1);
+  const [pages, setPages] = React.useState(0);
+  const [lastVisible, setLastVisible] = useState<any>();
+
+  console.log(cars);
+
+  useEffect(() => {
+    const getFirsLastVisible = async () => {
+      const queryGetCars = query(
+        collection(db, "cars"),
+        limit(6),
+        orderBy("autoMaker")
+      );
+      const documentSnapshots = await getDocs(queryGetCars);
+      setLastVisible(documentSnapshots.docs[documentSnapshots.docs.length - 1]);
+    };
+    getFirsLastVisible();
+  }, []);
+
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    if (cars.length / 6 < value) {
+      const getMoreCars = async () => {
+        const queryGetCars = query(
+          collection(db, "cars"),
+          orderBy("autoMaker"),
+          startAfter(lastVisible),
+          limit(6)
+        );
+        let mock: any = [];
+        const documentSnapshots = await getDocs(queryGetCars);
+        console.log(documentSnapshots);
+        documentSnapshots.forEach((doc) => {
+          mock.push({ ...doc.data(), id: doc.id });
+        });
+        setCarsInScreen(mock);
+        setCars([...cars, ...mock]);
+        setLastVisible(
+          documentSnapshots.docs[documentSnapshots.docs.length - 1]
+        );
+      };
+      getMoreCars();
+    } else {
+      console.log("Não faz requisuição");
+    }
+
+    setPage(value);
+  };
 
   const userStore = useSelector((state: RootState) => state.userSlice.user);
   useEffect(() => {
@@ -59,18 +119,27 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
       setCarsInScreen(newCars);
     }
 
-    handleCarsInScreen();
-
     {
       filter.length > 0 ? handleCarsInScreen() : setCarsInScreen(cars);
     }
   }, [filter, cars]);
+
+  const getCars = async () => {
+    const favoritesRef = collection(db, "cars");
+    const documents = await getDocs(favoritesRef);
+    setPages(Math.round(documents.size));
+    console.log(pages, "Total cars");
+  };
+
+  getCars();
 
   return (
     <>
       <AppBar />
       <Container>
         <SideLeft isTypeFavorite={false} />
+
+        <h1>Page: {page}</h1>
 
         {carsInScreen.length > 0 ? (
           <Content>
@@ -92,7 +161,11 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
                 marginTop: "1.5rem",
               }}
             >
-              <Pagination count={3} variant="outlined" />
+              <Pagination
+                count={Math.ceil(pages / 6)}
+                onChange={handleChange}
+                variant="outlined"
+              />
             </Box>
           </Content>
         ) : (
@@ -128,7 +201,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   const state = store.getState();
 
-  const cars = state.carsSlice.cars;
   const favorites = state.favoritesSlice.cars;
   let arrayCars: any = [];
   let arrayFavorites: any = [];
@@ -144,21 +216,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     });
   }
 
-  if (cars.length > 0) {
-    arrayCars = cars;
-  } else {
-    const querySnapshot = await getDocs(collection(db, "cars"));
-
-    arrayCars = querySnapshot.docs.map((doc) => {
-      console.log(doc.id, doc.data());
-      return {
-        id: doc.id,
-        ...doc.data(),
-      };
-    });
-  }
-
-  console.log(arrayCars);
+  const queryGetCars = query(
+    collection(db, "cars"),
+    limit(6),
+    orderBy("autoMaker")
+  );
+  const documentSnapshots = await getDocs(queryGetCars);
+  documentSnapshots.forEach((doc) => {
+    arrayCars.push({ ...doc.data(), id: doc.id });
+  });
 
   return {
     props: {

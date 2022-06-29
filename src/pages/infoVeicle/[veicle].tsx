@@ -6,6 +6,8 @@ import {
   FormControlLabel,
   Snackbar,
   SnackbarOrigin,
+  Stack,
+  TextField,
 } from "@mui/material";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { GetServerSideProps } from "next";
@@ -14,6 +16,7 @@ import Image from "next/image";
 import ResponsiveAppBar from "../../components/AppBar";
 import { db } from "../../firebase";
 import { ICarProps } from "../../redux/carsSlice";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 import {
   Container,
@@ -26,8 +29,13 @@ import {
   Title,
   FooterTitle,
   ContainerImage,
+  DatesContainer,
 } from "../../stylePages/stylesInfoVeicle";
-import { LoadingButton } from "@mui/lab";
+import {
+  LoadingButton,
+  LocalizationProvider,
+  MobileDatePicker,
+} from "@mui/lab";
 
 import { useTheme } from "@mui/material";
 
@@ -41,6 +49,7 @@ interface IUserProps {
 interface IInforVeicles {
   user: IUserProps;
   car: ICarProps;
+  id: String;
 }
 
 export interface State extends SnackbarOrigin {
@@ -49,7 +58,7 @@ export interface State extends SnackbarOrigin {
   open: boolean;
 }
 
-const InfoVeicle: React.FC<IInforVeicles> = ({ user, car }) => {
+const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
   const [extra1, setExtra1] = useState(0);
   const [extra2, setExtra2] = useState(0);
 
@@ -64,6 +73,16 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car }) => {
     vertical: "top",
     horizontal: "right",
   });
+
+  const ref = collection(db, "RentedCars");
+
+  const [value, setValue] = React.useState<Date | null>(
+    new Date("2014-08-18T21:11:54")
+  );
+
+  const handleChange = (newValue: Date | null) => {
+    setValue(newValue);
+  };
 
   const { vertical, horizontal, openSuccess, openError, open } = state;
 
@@ -82,18 +101,30 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car }) => {
   const reservVeicle = async () => {
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      handleClick(
-        {
-          vertical: "top",
-          horizontal: "right",
-        },
-        { openSuccess: true }
-      );
-    }, 2000);
-
-    setTimeout(() => {
+    try {
+      await addDoc(ref, {
+        model: car.model,
+        autoMaker: car.autoMaker,
+        amount: car.amount,
+        typeFuel: car.typeFuel,
+        category: car.category,
+        img: car.img,
+        seats: car.seats,
+        gear: car.gear,
+        userId: user?.id,
+        extras: [extra1, extra2],
+        id,
+      }).then(() => {
+        setIsLoading(false);
+        handleClick(
+          {
+            vertical: "top",
+            horizontal: "right",
+          },
+          { openSuccess: true }
+        );
+      });
+    } catch {
       setIsLoading(false);
       handleClick(
         {
@@ -102,24 +133,7 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car }) => {
         },
         { openError: true }
       );
-    }, 10000);
-
-    // const ref = collection(db, "RentedVeicles");
-    // await addDoc(ref, {
-    //   model: car.model,
-    //   autoMaker: car.autoMaker,
-    //   amount: car.amount,
-    //   typeFuel: car.typeFuel,
-    //   category: car.category,
-    //   img: car.img,
-    //   seats: car.seats,
-    //   gear: car.gear,
-    //   userId: user?.id,
-    //   extras: [extra1, extra2],
-    // }).then(() => {
-    //   setIsLoading(false);
-    //   handleClick();
-    // });
+    }
   };
 
   const handleExtra1 = () => {
@@ -173,6 +187,28 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car }) => {
               label="Vidros Escuros + RS75,00"
             />
           </CheckBoxArea>
+
+          <DatesContainer>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <Stack spacing={3}>
+                <MobileDatePicker
+                  label="Data da locação"
+                  inputFormat="MM/dd/yyyy"
+                  value={value}
+                  onChange={handleChange}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+
+                <MobileDatePicker
+                  label="Data da devolução"
+                  inputFormat="MM/dd/yyyy"
+                  value={value}
+                  onChange={handleChange}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </Stack>
+            </LocalizationProvider>
+          </DatesContainer>
 
           <Footer>
             <FooterTitle>
@@ -260,6 +296,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     props: {
       user,
       car,
+      id,
     },
   };
 };

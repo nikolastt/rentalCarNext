@@ -1,5 +1,5 @@
 import { Avatar, CardActions, CardHeader, CardMedia, Divider, Grid, IconButton, IconButtonProps, List, ListItem, ListItemText, styled, Typography } from "@mui/material";
-import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { GetServerSideProps } from "next";
 import { getSession, useSession } from "next-auth/react";
 import { Card, Col, Collapse, ListGroup, Row, Container } from "react-bootstrap";
@@ -11,9 +11,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 
 //import * as React from "react";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { userInfo } from "os";
+import { store } from "../../redux/store";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -31,16 +32,44 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 }));
 
 const Dashboard: React.FC = () => {
+  const [ SUV, setCountSUV ] = useState(0);
+  const [ sedan, setCountSedan ] = useState(0);
+  const [ compacto, setCountCompacto ] = useState(0);
+  const [ utilitario, setCountUtilitario ] = useState(0);
+  const [ picape, setCountPicape ] = useState(0);
+  
+  // const categoryes = useMemo(() => {
+  //   let uniqueCategoryes: string[] = [];
+  //   const categoryes = cars.map((item) => {
+  //     return item.category[0].toUpperCase() + item.category.slice(1);
+  //   });
 
+  //   categoryes.forEach((item, index) => {
+    //     if (!uniqueCategoryes.includes(item)) {
+      //       uniqueCategoryes.push(item);
+      //     }
+  //   });
+  //   return uniqueCategoryes;
+  // }, [cars]);
+  
   // PieChart
+  // const data = [
+  //   { name: 'SUV', value: SUV },
+  //   { name: 'compacto', value: compacto },
+  //   { name: 'Sedan', value: sedan },
+  //   { name: 'utilitario', value: utilitario },
+  //   { name: 'picape', value: picape },
+  // ];
+
   const data = [
-    { name: 'Group A', value: 400 },
-    { name: 'Group B', value: 300 },
-    { name: 'Group C', value: 300 },
-    { name: 'Group D', value: 200 },
+    { name: 'SUV', value: 0 },
+    { name: 'compacto', value: 0 },
+    { name: 'Sedan', value: 0 },
+    { name: 'utilitario', value: 0 },
+    { name: 'picape', value: 0 },
   ];
   
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF8344'];
   
   const RADIAN = Math.PI / 180;
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
@@ -66,38 +95,59 @@ const Dashboard: React.FC = () => {
       //console.log(doc.id, " => ", doc.data());
     });
   }
+
+  const [ categorias, setCategorias ] = useState<string[]>([]);
   
   const getCarType = async () => {
+    const categories: any = []
     const q = query(collection(db, "RentedCars"));
 
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
       if (session?.id === doc.data().userId) {
-        console.log(doc.data());
-
+        console.log(doc.data().category);
+        categories.push(doc.data().category)
       }
       // doc.data() is never undefined for query doc snapshots
-});
+    });
+    
   }
 
-  const editUser = async () => {
-    const q = query(collection(db, "personal_info"));
-
-    const querySnapshot = await getDocs(q);
-  }
-
-  const setEmail = async () => {
-
-    const emailRef = doc(db, "personalInfo");
-
-    await setDoc(emailRef, {merge: true}), {
-      email: "Los Angeles",
-    };
-  }
-
-  getCarType()
+  useEffect(() => {
+    const getQuantCategorias = () => {
+      let countSUV = 0;
+      let countCompacto = 0;
+      let countSedan = 0;
+      let countUtilitario = 0;
+      let countPicape = 0;
+      categorias?.map((categoria) => {
+        if (categoria === "SUV") {
+          countSUV++;
+        } else if (categoria.toLowerCase() === "compacto") {
+          countCompacto++;
+        } else if (categoria.toLowerCase() === "sedan") {
+          countSedan++;
+        } else if (categoria.toLowerCase() === "utilitario") {
+          countUtilitario++;
+        } else if (categoria.toLowerCase() === "picape") {
+          countPicape++;
+        }
+      });
   
-  getPerfil();
+      setCountSUV(countSUV);
+      setCountCompacto(countCompacto);
+      setCountSedan(countSedan);
+      setCountUtilitario(countUtilitario);
+      setCountPicape(countPicape);
+    }
+
+    getQuantCategorias()
+  }, [])
+  
+
+
+
+  //getPerfil();
   
 
 // Expand 
@@ -154,8 +204,8 @@ const Dashboard: React.FC = () => {
        <Grid item xs={3} lg={2} md={4}>
         <List>
           <ListItem>
-            <ListItemText primary="Nome" secondary={"getEmail()"} />
-            <IconButton edge="end" aria-label="edit" onClick={() => editUser()}>
+            <ListItemText primary="Nome" secondary={""} />
+            <IconButton edge="end" aria-label="edit">
               <EditIcon/>
             </IconButton>
           </ListItem>
@@ -176,13 +226,6 @@ const Dashboard: React.FC = () => {
           <Divider />
           <ListItem>
             <ListItemText primary="Localização" secondary={"getEmail()"} />
-            <IconButton edge="end" aria-label="edit" >
-              <EditIcon/>
-            </IconButton>
-          </ListItem>
-          <Divider />
-          <ListItem>
-            <ListItemText primary="Email" secondary={"getEmail()"} />
             <IconButton edge="end" aria-label="edit" >
               <EditIcon/>
             </IconButton>
@@ -242,7 +285,7 @@ const Dashboard: React.FC = () => {
     </Container>
     </>
   );
-}
+};
 
 export default Dashboard;
 
@@ -265,7 +308,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     id: session.id,
   };
 
-  const q = query(collection(db, "accounts"));
 
 
   return {
@@ -274,3 +316,4 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     },
   };
 };
+
