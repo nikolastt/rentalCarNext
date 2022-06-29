@@ -157,7 +157,7 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
             })}
             <Box
               sx={{
-                display: "flex",
+                display: "flex ",
                 justifyContent: "center",
                 width: "100%",
                 marginTop: "1.5rem",
