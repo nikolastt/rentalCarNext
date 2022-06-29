@@ -63,11 +63,11 @@ const Dashboard: React.FC = () => {
   // ];
 
   const data = [
-    { name: 'SUV', value: 0 },
-    { name: 'compacto', value: 0 },
-    { name: 'Sedan', value: 0 },
-    { name: 'utilitario', value: 0 },
-    { name: 'picape', value: 0 },
+    { name: 'SUV', value: SUV },
+    { name: 'compacto', value: compacto },
+    { name: 'Sedan', value: sedan },
+    { name: 'utilitario', value: utilitario },
+    { name: 'picape', value: picape },
   ];
   
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF8344'];
@@ -200,7 +200,7 @@ const Dashboard: React.FC = () => {
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
       if (session?.id === doc.data().userId) {
-        console.log(doc.data().autoMaker);
+        // console.log(doc.data().autoMaker);
         lastRentedMaker = doc.data().autoMaker
         lastRentedModel = doc.data().model
         lastRentedImg = doc.data().img
@@ -219,6 +219,8 @@ const Dashboard: React.FC = () => {
   getRentCount();
   getLastRent();
   getfavCount();
+
+  console.log(SUV)
 
   // Editar telefone e localização
   
