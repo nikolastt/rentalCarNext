@@ -4,7 +4,7 @@ import { GetServerSideProps } from "next";
 import { getSession, useSession } from "next-auth/react";
 import { Card, Col, Collapse, ListGroup, Row, Container } from "react-bootstrap";
 import { db } from "../../firebase";
-import { CardContent, ContentHeader } from "../Cards/styles";
+import { CardContent, ContentHeader, ImageContent } from "../Cards/styles";
 // Icons
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -105,15 +105,17 @@ const Dashboard: React.FC = () => {
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
       if (session?.id === doc.data().userId) {
-        console.log(doc.data().category);
+        // console.log(doc.data().category);
         categories.push(doc.data().category)
       }
       // doc.data() is never undefined for query doc snapshots
     });
     
+    setCategorias(categories)
   }
 
   useEffect(() => {
+    getCarType()
     const getQuantCategorias = () => {
       let countSUV = 0;
       let countCompacto = 0;
@@ -121,7 +123,7 @@ const Dashboard: React.FC = () => {
       let countUtilitario = 0;
       let countPicape = 0;
       categorias?.map((categoria) => {
-        if (categoria === "SUV") {
+        if (categoria.toLowerCase() === "suv") {
           countSUV++;
         } else if (categoria.toLowerCase() === "compacto") {
           countCompacto++;
@@ -143,9 +145,71 @@ const Dashboard: React.FC = () => {
 
     getQuantCategorias()
   }, [])
+
+  const [ favCount, setFavCount] = useState<number>();
+
+  const getfavCount = async () => {
+    const q = query(collection(db, "Favorites"));
+    let favCount = 0;
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      if (session?.id === doc.data().userId) {
+        // console.log(doc.data().autoMaker);
+
+        favCount++;
+      }
+    });
+    setFavCount(favCount)
+  }
+
+
+  const [ rentCount, setRentCount] = useState<number>();
+
+  const getRentCount = async () => {
+    const q = query(collection(db, "RentedCars"));
+    let rentCount = 0;
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      if (session?.id === doc.data().userId) {
+        // console.log(doc.data().autoMaker);
+        rentCount++;
+      }
+    });
+    setRentCount(rentCount)
+  }
   
+  // get last rented car
+
+  const [ lastRentedMaker, setLastRentedMaker] = useState<string>();
+  const [ lastRentedModel, setLastRentedModel] = useState<string>();
+  const [ lastRentedImg, setLastRentedImg] = useState<string>();
+
+  const getLastRent = async () => {
+    const q = query(collection(db, "RentedCars"));
+    let lastRentedMaker;
+    let lastRentedModel;
+    let lastRentedImg;
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      if (session?.id === doc.data().userId) {
+        console.log(doc.data().autoMaker);
+        lastRentedMaker = doc.data().autoMaker
+        lastRentedModel = doc.data().model
+        lastRentedImg = doc.data().img
+      }
+    });
+    setLastRentedMaker(lastRentedMaker)
+    setLastRentedModel(lastRentedModel)
+    setLastRentedImg(lastRentedImg)
+  }
 
 
+  getRentCount();
+  getLastRent();
+  getfavCount();
 
   //getPerfil();
   
@@ -170,7 +234,7 @@ const Dashboard: React.FC = () => {
 
       {/* Datas */}
       <Grid item xs={3}>
-        Quantidade de carros alugados
+        Tipo de carros alugados
         <div style={{height: "400px", width: "400px"}}>
         <ResponsiveContainer width="100%" height="100%">
         <PieChart width={400} height={400}>
@@ -194,7 +258,19 @@ const Dashboard: React.FC = () => {
       </Grid>
 
       <Grid item xs={3}>
-        Tipo de carros alugados
+        <Card >
+        <CardHeader
+        // Nome do carro
+          title={`Quantidade de carros alugados: ${rentCount}`}
+        // Informação adicional
+          subheader={`Seus favoritos: ${favCount}`}
+          
+        />
+            <IconButton edge="end" aria-label="edit" >
+              <EditIcon/>
+            </IconButton>
+        </Card>
+
       </Grid>
 
       </Grid>
@@ -204,14 +280,14 @@ const Dashboard: React.FC = () => {
        <Grid item xs={3} lg={2} md={4}>
         <List>
           <ListItem>
-            <ListItemText primary="Nome" secondary={""} />
+            <ListItemText primary="Nome" secondary={`${session?.user?.name}`} />
             <IconButton edge="end" aria-label="edit">
               <EditIcon/>
             </IconButton>
           </ListItem>
           <Divider />
           <ListItem>
-            <ListItemText primary="Email" secondary={"getEmail()"} />
+            <ListItemText primary="Email" secondary={`${session?.user?.email}`} />
             <IconButton edge="end" aria-label="edit" >
               <EditIcon/>
             </IconButton>
@@ -239,7 +315,7 @@ const Dashboard: React.FC = () => {
       <Card >
       <CardHeader
       // Nome do carro
-        title="Shrimp and Chorizo Paella"
+        title={lastRentedMaker + " " + lastRentedModel}
       // Informação adicional
         subheader="September 14, 2016"
       />
@@ -249,9 +325,10 @@ const Dashboard: React.FC = () => {
       {/* <CardMedia
         component="img"
         height="194"
-        image="/static/images/cards/paella.jpg"
+        image={lastRentedImg}
         alt="Paella dish"
       /> */}
+      
       <CardActions disableSpacing>
         <ExpandMore
           expand={expanded}
