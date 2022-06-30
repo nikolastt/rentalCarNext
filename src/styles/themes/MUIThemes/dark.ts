@@ -26,7 +26,7 @@ const darkThemeMUI = createTheme({
       main: "#4AE04C",
     },
     info: {
-      main: "#02A2ED",
+      main: "#8884d8",
     },
 
     text: {

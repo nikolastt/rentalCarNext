@@ -15,8 +15,8 @@ export const Container = styled.div`
 
 export const SideLeft = styled.div<ISideLeft>`
   width: 30%;
-  background-color: red;
   height: 90%;
+  max-height: 500px;
 
   display: flex;
   flex-direction: column;
@@ -32,21 +32,41 @@ export const SideLeft = styled.div<ISideLeft>`
   );
 
   & h3 {
-    margin-top: 2rem;
+    margin-top: 1rem;
+    height: 20%;
+  }
+
+  & p {
+    text-align: center;
+    margin: 0;
+    height: 20%;
+  }
+
+  Button {
+    margin-top: 0.6rem;
+    height: 20%;
   }
 `;
 
 export const ContentImage = styled.div`
   position: relative;
-  width: 176px;
-  height: 176px;
+  min-width: 176px;
+  min-height: 176px;
   border-radius: 50%;
   overflow: hidden;
   margin-top: 3rem;
 `;
 
 export const SideRight = styled.div`
-  padding: 2rem;
+  padding: 0 2rem 2rem 2rem;
   width: 70%;
   height: 80%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h2 {
+    margin-bottom: 2rem;
+  }
 `;
