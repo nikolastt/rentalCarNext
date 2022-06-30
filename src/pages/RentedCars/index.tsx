@@ -9,8 +9,22 @@ import Cards from "../../components/Cards/intex";
 import { db } from "../../firebase";
 import { ICarProps } from "../../redux/carsSlice";
 
+interface ICarRented {
+  id?: string;
+  model: string;
+  autoMaker: string;
+  amount: string;
+  typeFuel: string;
+  category: string;
+  img: string;
+  seats: string;
+  gear: string;
+  valueDateLocation: Date;
+  ValueDateDevolution: Date;
+}
+
 interface IRentedCars {
-  arrayRentedCars: ICarProps[];
+  arrayRentedCars: ICarRented[];
 }
 
 const RentedCars: React.FC<IRentedCars> = ({ arrayRentedCars }) => {
