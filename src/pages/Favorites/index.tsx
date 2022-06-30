@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Cards, { IDataProps } from "../../components/Cards/intex";
 
-import { Container, Content } from "../../stylePages/stylesBooking";
+import {
+  Container,
+  Content,
+  NoFavorites,
+} from "../../stylePages/stylesBooking";
 
 import SideLeft from "../../components/SideLeft";
 
@@ -14,11 +18,14 @@ import { collection, getDocs, query, limit, where } from "firebase/firestore";
 import { db } from "../../firebase";
 
 import Pagination from "@mui/material/Pagination";
-import { Box } from "@mui/material";
+import { Box, Button, useTheme } from "@mui/material";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import { setFavoriteCars } from "../../redux/favoriteslice";
 import { setUSer } from "../../redux/userSlice";
+import { LoadingButton } from "@mui/lab";
+import { FaRegSadCry } from "react-icons/fa";
+import Link from "next/link";
 
 interface IUserProps {
   name: string;
@@ -37,10 +44,23 @@ const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
   const filter = useSelector((state: RootState) => state.filterByCategory);
   const dispatch = useDispatch();
   const userStore = useSelector((state: RootState) => state.userSlice.user);
+  const [qntCarsInScreen, setQntCarsInScreen] = useState(6);
+  const [noMoreCars, setnoMoreCars] = React.useState(false);
 
   const favorites = useSelector(
     (state: RootState) => state.favoritesSlice.cars
   );
+
+  const handleChange = () => {
+    if (favorites.length - 6 > qntCarsInScreen) {
+      setQntCarsInScreen(qntCarsInScreen + 6);
+    } else {
+      setQntCarsInScreen(favorites.length);
+      setnoMoreCars(true);
+    }
+  };
+
+  const theme = useTheme();
 
   useEffect(() => {
     if (!userStore.email) {
@@ -58,17 +78,34 @@ const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
 
   useEffect(() => {
     function handleCarsInScreen() {
-      const newCars = favorites.filter((item: ICarProps) => {
+      setQntCarsInScreen(6);
+      const newCars = favorites.filter((item) => {
         return (
-          filter.includes(item?.category?.toLowerCase()) ||
+          filter.includes(item.category.toLowerCase()) ||
           filter.includes(item.seats)
         );
       });
 
+      if (newCars.length < 6) {
+        setnoMoreCars(true);
+      } else {
+        setnoMoreCars(false);
+      }
+
       setCarsInScreen(newCars);
     }
 
-    filter.length > 0 ? handleCarsInScreen() : setCarsInScreen(favorites);
+    if (filter.length > 0) {
+      handleCarsInScreen();
+    } else {
+      if (favorites.length < 6) {
+        setnoMoreCars(true);
+      } else {
+        setnoMoreCars(false);
+      }
+      setCarsInScreen(favorites);
+      setQntCarsInScreen(6);
+    }
   }, [filter, favorites]);
 
   return (
@@ -80,31 +117,52 @@ const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
             <SideLeft isTypeFavorite={true} />
             <Content>
               {carsInScreen.map((item, index) => {
-                return (
-                  <Cards
-                    car={item}
-                    key={item.model}
-                    favorites={arrayFavorites}
-                    width="33.3%"
-                  />
-                );
+                if (index < qntCarsInScreen) {
+                  return (
+                    <Cards
+                      car={item}
+                      key={item.model}
+                      favorites={arrayFavorites}
+                      width="33.3%"
+                    />
+                  );
+                }
               })}
               <Box
                 sx={{
-                  display: "flex",
+                  display: "flex ",
                   justifyContent: "center",
                   width: "100%",
                   marginTop: "1.5rem",
                 }}
               >
-                <Pagination count={3} variant="outlined" />
+                <LoadingButton
+                  loadingPosition="start"
+                  variant="outlined"
+                  onClick={() => handleChange()}
+                  disabled={noMoreCars ? true : false}
+                >
+                  {noMoreCars ? "NÃO HÁ MAIS CARROS" : "CARREGAR MAIS CARROS"}
+                </LoadingButton>
               </Box>
             </Content>
           </>
         ) : (
-          <Content>
-            <h1>Você não tem nenhum carro favoritado</h1>
-          </Content>
+          <NoFavorites>
+            <h3 style={{ color: theme.palette.text.secondary }}>
+              Você não tem nenhum carro favoritado
+            </h3>
+            <FaRegSadCry size={65} color={theme.palette.text.secondary} />
+
+            <Link href="/Booking">
+              <Button
+                sx={{ marginTop: "4rem", width: "20%" }}
+                variant="contained"
+              >
+                Ir para veículos
+              </Button>
+            </Link>
+          </NoFavorites>
         )}
       </Container>
     </>

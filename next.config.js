@@ -6,6 +6,7 @@ const nextConfig = {
       "www.localiza.com",
       "storage.googleapis.com",
       "media.discordapp.net",
+      "avatars.githubusercontent.com",
     ],
   },
 };

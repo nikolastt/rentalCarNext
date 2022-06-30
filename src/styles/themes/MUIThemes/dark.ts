@@ -31,7 +31,7 @@ const darkThemeMUI = createTheme({
 
     text: {
       primary: "#ffffffff",
-      secondary: "#f2f2f2f2",
+      secondary: "#656565",
     },
   },
 });

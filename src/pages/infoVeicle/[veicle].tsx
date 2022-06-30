@@ -76,12 +76,18 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
 
   const ref = collection(db, "RentedCars");
 
-  const [value, setValue] = React.useState<Date | null>(
-    new Date("2014-08-18T21:11:54")
+  const [valueDateLocation, setValueDateLocation] = React.useState<Date | null>(
+    new Date()
   );
+  const [valueDateDevolution, setValueDateDevolution] =
+    React.useState<Date | null>(new Date());
 
-  const handleChange = (newValue: Date | null) => {
-    setValue(newValue);
+  const handleChangeDataLocation = (newValue: Date | null) => {
+    setValueDateLocation(newValue);
+  };
+
+  const handleChangeDataDevolution = (newValue: Date | null) => {
+    setValueDateDevolution(newValue);
   };
 
   const { vertical, horizontal, openSuccess, openError, open } = state;
@@ -193,17 +199,17 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
               <Stack spacing={3}>
                 <MobileDatePicker
                   label="Data da locação"
-                  inputFormat="MM/dd/yyyy"
-                  value={value}
-                  onChange={handleChange}
+                  inputFormat="dd/MM/yyyy"
+                  value={valueDateLocation}
+                  onChange={handleChangeDataLocation}
                   renderInput={(params) => <TextField {...params} />}
                 />
 
                 <MobileDatePicker
                   label="Data da devolução"
-                  inputFormat="MM/dd/yyyy"
-                  value={value}
-                  onChange={handleChange}
+                  inputFormat="dd/MM/yyyy"
+                  value={valueDateDevolution}
+                  onChange={handleChangeDataDevolution}
                   renderInput={(params) => <TextField {...params} />}
                 />
               </Stack>

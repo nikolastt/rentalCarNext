@@ -1,39 +1,22 @@
 import React, { useEffect, useState } from "react";
 import Cards, { IDataProps } from "../../components/Cards/intex";
-
 import { Container, Content } from "../../stylePages/stylesBooking";
-
 import SideLeft from "../../components/SideLeft";
-
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../redux/store";
 import AppBar from "../../components/AppBar";
-// import { ICarProps } from "../../redux/carsSlice";
-import {
-  collection,
-  getDocs,
-  query,
-  limit,
-  where,
-  orderBy,
-  startAt,
-  startAfter,
-  QuerySnapshot,
-  DocumentData,
-} from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
-
-import Pagination from "@mui/material/Pagination";
 import { Box, Button } from "@mui/material";
-import { GetServerSideProps, GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import { setUSer } from "../../redux/userSlice";
 
 import { store } from "../../redux/store";
-import { ICarProps } from "../../redux/carsSlice";
+import { ICarProps, getCars } from "../../redux/carsSlice";
 import { LoadingButton } from "@mui/lab";
 
-interface IUserProps {
+export interface IUserProps {
   name: string;
   email: string;
   image: string;
@@ -46,73 +29,44 @@ interface IBooking {
   arrayFavorites: IDataProps[];
   lastVisible: any;
   totalCars: number;
+  cars: ICarProps[];
 }
 
 const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
   const [carsInScreen, setCarsInScreen] = useState<ICarProps[]>([]);
   const filter = useSelector((state: RootState) => state.filterByCategory);
-  const [cars, setCars] = useState<ICarProps[]>(arrayCars);
   const dispatch = useDispatch();
   const [noMoreCars, setnoMoreCars] = React.useState(false);
-  const [pages, setPages] = React.useState(0);
-  const [lastVisible, setLastVisible] = useState<any>();
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const getFirsLastVisible = async () => {
-      const queryGetCars = query(
-        collection(db, "cars"),
-        limit(6),
-        orderBy("autoMaker")
-      );
-      const documentSnapshots = await getDocs(queryGetCars);
-      setLastVisible(documentSnapshots.docs[documentSnapshots.docs.length - 1]);
-    };
-    getFirsLastVisible();
-  }, []);
-
-  const handleChange = () => {
-    setLoading(true);
-    const getMoreCars = async () => {
-      const queryGetCars = query(
-        collection(db, "cars"),
-        orderBy("autoMaker"),
-        startAfter(lastVisible),
-        limit(6)
-      );
-      let mock: any = [];
-      const documentSnapshots = await getDocs(queryGetCars);
-      if (documentSnapshots.docs.length > 0) {
-        documentSnapshots.forEach((doc) => {
-          mock.push({ ...doc.data(), id: doc.id });
-        });
-        setCarsInScreen(mock);
-        setCars([...cars, ...mock]);
-        setLastVisible(
-          documentSnapshots.docs[documentSnapshots.docs.length - 1]
-        );
-        setLoading(false);
-      } else {
-        setnoMoreCars(true);
-        setLoading(false);
-      }
-    };
-    if (lastVisible !== undefined) {
-      getMoreCars();
-    } else {
-      setnoMoreCars(true);
-    }
-  };
+  const [qntCarsInScreen, setQntCarsInScreen] = useState(6);
+  const cars = arrayCars;
 
   const userStore = useSelector((state: RootState) => state.userSlice.user);
+  const carsStore = useSelector((state: RootState) => state.carsSlice.cars);
+
   useEffect(() => {
     if (!userStore.email) {
       dispatch(setUSer(user));
     }
   }, [dispatch, user, userStore]);
+  useEffect(() => {
+    if (carsStore.length <= 0) {
+      dispatch(getCars(cars));
+    }
+  }, [dispatch, cars, carsStore]);
+
+  const handleChange = () => {
+    if (cars.length - 6 > qntCarsInScreen) {
+      setQntCarsInScreen(qntCarsInScreen + 6);
+    } else {
+      setQntCarsInScreen(cars.length);
+      setnoMoreCars(true);
+    }
+  };
 
   useEffect(() => {
     function handleCarsInScreen() {
+      setQntCarsInScreen(6);
       const newCars = cars.filter((item) => {
         return (
           filter.includes(item.category.toLowerCase()) ||
@@ -120,22 +74,27 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
         );
       });
 
+      if (newCars.length < 6) {
+        setnoMoreCars(true);
+      } else {
+        setnoMoreCars(false);
+      }
+
       setCarsInScreen(newCars);
     }
 
-    {
-      filter.length > 0 ? handleCarsInScreen() : setCarsInScreen(cars);
+    if (filter.length > 0) {
+      handleCarsInScreen();
+    } else {
+      if (cars.length < 6) {
+        setnoMoreCars(true);
+      } else {
+        setnoMoreCars(false);
+      }
+      setCarsInScreen(cars);
+      setQntCarsInScreen(6);
     }
   }, [filter, cars]);
-
-  const getCars = async () => {
-    const favoritesRef = collection(db, "cars");
-    const documents = await getDocs(favoritesRef);
-    setPages(Math.round(documents.size));
-    console.log(pages, "Total cars");
-  };
-
-  getCars();
 
   return (
     <>
@@ -146,14 +105,16 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
         {carsInScreen.length > 0 ? (
           <Content>
             {carsInScreen.map((item, index) => {
-              return (
-                <Cards
-                  car={item}
-                  key={item.model}
-                  width="33.3%"
-                  favorites={arrayFavorites}
-                />
-              );
+              if (index < qntCarsInScreen) {
+                return (
+                  <Cards
+                    car={item}
+                    key={item.model}
+                    width="33.3%"
+                    favorites={arrayFavorites}
+                  />
+                );
+              }
             })}
             <Box
               sx={{
@@ -208,6 +169,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const state = store.getState();
 
   const favorites = state.favoritesSlice.cars;
+  const cars = state.carsSlice.cars;
   let arrayCars: any = [];
   let arrayFavorites: any = [];
 
@@ -222,15 +184,16 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     });
   }
 
-  const queryGetCars = query(
-    collection(db, "cars"),
-    limit(6),
-    orderBy("autoMaker")
-  );
-  const documentSnapshots = await getDocs(queryGetCars);
-  documentSnapshots.forEach((doc) => {
-    arrayCars.push({ ...doc.data(), id: doc.id });
-  });
+  if (cars.length > 0) {
+    arrayCars = cars;
+  } else {
+    const querySnapshot = await getDocs(collection(db, "cars"));
+    querySnapshot.forEach((doc) => {
+      arrayCars.push({ ...doc.data(), id: doc.id });
+    });
+  }
+
+  console.log(arrayCars);
 
   return {
     props: {
