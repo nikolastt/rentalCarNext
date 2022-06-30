@@ -7,9 +7,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   Legend,
-  Pie,
   PieChart,
   PolarAngleAxis,
   PolarGrid,
@@ -23,7 +21,6 @@ import {
 } from "recharts";
 import ResponsiveAppBar from "../../components/AppBar";
 import { db } from "../../firebase";
-import { ICarProps } from "../../redux/carsSlice";
 
 import {
   Container,
@@ -36,51 +33,119 @@ import {
   ContainerDown,
   ContentUp,
   SideRight,
+  SideRightContent,
+  Title,
 } from "../../stylePages/stylesDashboard";
 
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip as TooltipChart,
+  Legend as LegendChart,
+} from "chart.js";
+import { Pie } from "react-chartjs-2";
+import getMonthString from "../../assets/returnMonthString";
+
 interface IDashboard {
-  teste: any;
-  teste2: any;
+  dataMostRentedVeicles: any;
+  dataMostRentedCars: any;
+  dataNumberOfCarsRentedInTheMonths: any;
 }
 
-const data = [
-  { name: "Group A", value: 400 },
-  { name: "Group B", value: 300 },
-  { name: "Group C", value: 300 },
-  { name: "Group D", value: 200 },
-];
+ChartJS.register(ArcElement, TooltipChart, LegendChart);
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
-
-const RADIAN = Math.PI / 180;
-
-const Dashboard: React.FC<IDashboard> = ({ teste, teste2 }) => {
+const Dashboard: React.FC<IDashboard> = ({
+  dataMostRentedVeicles,
+  dataMostRentedCars,
+  dataNumberOfCarsRentedInTheMonths,
+}) => {
   const theme = useTheme();
-  console.log(teste, "data");
+
+  const dataTeste = dataMostRentedCars.map((item: any) => {
+    return item.count;
+  });
+
+  const dataTeste2 = dataMostRentedCars.map((item: any) => {
+    return item.category;
+  });
+
+  const data = {
+    labels: dataTeste2,
+    datasets: [
+      {
+        label: "# of Votes",
+        data: dataTeste,
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.2)",
+          "rgba(54, 162, 235, 0.2)",
+          "rgba(255, 206, 86, 0.2)",
+          "rgba(75, 192, 192, 0.2)",
+          "rgba(153, 102, 255, 0.2)",
+          "rgba(255, 159, 64, 0.2)",
+        ],
+        borderColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+          "rgba(255, 159, 64, 1)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
   return (
     <>
       <ResponsiveAppBar />
       <Container>
         <SideLeft>
           <ContainerUp>
-            <ContentUp></ContentUp>
+            <Title>Total veículos alugados por mes</Title>
+            <ContentUp primaryColor={theme.palette.primary.main}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  width={500}
+                  height={300}
+                  data={dataNumberOfCarsRentedInTheMonths}
+                  margin={{
+                    top: 10,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid stroke="white" strokeDasharray="3 3" />
+                  <XAxis dataKey="monthString" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="countCars" stackId="a" fill="#c7ad9096" />
+                </BarChart>
+              </ResponsiveContainer>
+            </ContentUp>
           </ContainerUp>
-
           <ContainerDown>
             <ContainerDownLeft>
+              <Title>Carros mais alugados</Title>
               <ContentDownLeft primaryColor={theme.palette.primary.main}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart cx="50%" cy="50%" outerRadius="80%" data={teste2}>
+                  <RadarChart
+                    cx="50%"
+                    cy="50%"
+                    outerRadius="80%"
+                    data={dataMostRentedVeicles}
+                  >
                     <PolarGrid />
                     <PolarAngleAxis
                       stroke={theme.palette.primary.contrastText}
-                      dataKey="category"
+                      dataKey="nome"
                       color="red"
                     />
                     <PolarRadiusAxis color="red" />
                     <Radar
                       name="Mike"
-                      dataKey="count"
+                      dataKey="quantidade"
                       stroke="#8884d8"
                       fill="#8884d8"
                       fillOpacity={0.6}
@@ -90,32 +155,19 @@ const Dashboard: React.FC<IDashboard> = ({ teste, teste2 }) => {
               </ContentDownLeft>
             </ContainerDownLeft>
             <ContainerDownRight>
-              <ContentDownRight></ContentDownRight>
+              <Title>Veículos alugados por mes</Title>
+              <ContentDownRight
+                primaryColor={theme.palette.primary.main}
+              ></ContentDownRight>
             </ContainerDownRight>
           </ContainerDown>
         </SideLeft>
 
         <SideRight>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              width={500}
-              height={300}
-              data={teste2}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="category" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="count" stackId="a" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
+          <Title>Categorias mais alugadas</Title>
+          <SideRightContent primaryColor={theme.palette.primary.main}>
+            <Pie data={data} options={{ maintainAspectRatio: false }} />
+          </SideRightContent>
         </SideRight>
       </Container>
     </>
@@ -143,22 +195,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     id: session.id,
   };
 
-  const arrayDataMoreVaiclesLocated: any[] = [];
-
+  const arrayDataVaiclesLocated: any[] = [];
   const querySnapshot = await getDocs(collection(db, "RentedCars"));
   querySnapshot.forEach((doc) => {
-    arrayDataMoreVaiclesLocated.push({ ...doc.data() });
+    arrayDataVaiclesLocated.push({ ...doc.data() });
   });
 
-  //   const favoritesRef = collection(db, "RentedCars");
-  //   const q = query(favoritesRefs);
-  //   const documents = await getDocs(q);
-  //   documents.forEach((doc) => {
-  //     arrayDataMoreVaiclesLocated.push({ ...doc.data() });
-  //   });
-
   const nameCars: string[] = [];
-  arrayDataMoreVaiclesLocated.map((car) => {
+  arrayDataVaiclesLocated.map((car) => {
     if (!nameCars.includes(car.model)) {
       nameCars.push(car.model);
     }
@@ -168,7 +212,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   nameCars.map((name) => {
     let quantidade = 0;
     let nome = name;
-    arrayDataMoreVaiclesLocated.map((car) => {
+    arrayDataVaiclesLocated.map((car) => {
       if (name === car.model) {
         quantidade++;
         name = car.model;
@@ -192,14 +236,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     return 0;
   });
 
-  const arrayCars: any[] = [];
-
   const categories: any = [];
-
-  const querySnapshotCars = await getDocs(collection(db, "cars"));
-  querySnapshotCars.forEach((doc) => {
-    arrayDataMoreVaiclesLocated.push({ ...doc.data() });
-    categories.push(doc.data().category);
+  arrayDataVaiclesLocated.forEach((car) => {
+    categories.push(car.category);
   });
 
   let countSUV = 0;
@@ -221,7 +260,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     }
   });
 
-  const teste2 = [
+  const dataMostRentedCars = [
     {
       category: "suv",
       count: countSUV,
@@ -244,13 +283,53 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     },
   ];
 
-  const teste = dataMoreVeicles.slice(0, 6);
+  const dataMostRentedVeicles = dataMoreVeicles.slice(0, 6);
+
+  const meses: number[] = [];
+
+  arrayDataVaiclesLocated.map((car) => {
+    const date = new Date(Date.parse(car.valueDateDevolution));
+    if (!meses.includes(date.getMonth() + 1)) {
+      meses.push(date.getMonth() + 1);
+    }
+  });
+
+  meses.sort(function (a, b) {
+    if (a > b) {
+      return 1;
+    }
+    if (a < b) {
+      return -1;
+    }
+    return 0;
+  });
+
+  const dataNumberOfCarsRentedInTheMonths: any = [];
+  meses.map((mes: number) => {
+    let month = mes;
+    let countCars = 0;
+    let monthString;
+    monthString = getMonthString(mes);
+    arrayDataVaiclesLocated.map((car) => {
+      const date = new Date(Date.parse(car.valueDateDevolution));
+      if (date.getMonth() + 1 === mes) {
+        countCars++;
+      }
+    });
+
+    dataNumberOfCarsRentedInTheMonths.push({
+      month,
+      countCars,
+      monthString,
+    });
+  });
 
   return {
     props: {
       user,
-      teste,
-      teste2,
+      dataMostRentedVeicles,
+      dataMostRentedCars,
+      dataNumberOfCarsRentedInTheMonths,
     },
   };
 };

@@ -6,8 +6,9 @@ interface IPrimaryColor {
 
 export const Container = styled.div`
   width: 100%;
-  height: calc(100vh - 8rem);
+  height: calc(100vh - 7rem);
   display: flex;
+  overflow-y: hidden;
 `;
 
 export const SideLeft = styled.div`
@@ -18,29 +19,31 @@ export const SideLeft = styled.div`
 export const ContainerUp = styled.div`
   width: 100%;
   height: 50%;
-  padding: 1rem;
+  padding: 2rem;
 `;
 
-export const ContentUp = styled.div`
-  background-color: gold;
+export const ContentUp = styled.div<IPrimaryColor>`
   width: 100%;
   height: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid ${(props) => props.primaryColor};
+  background-image: linear-gradient(
+    120deg,
+    #101010 10%,
+    ${(props) => props.primaryColor} 1000%
+  );
   border-radius: 0.5rem;
 `;
 export const ContainerDownLeft = styled.div`
   width: 50%;
   height: 50%;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
+  padding: 2rem;
 `;
 
 export const ContainerDownRight = styled.div`
   width: 50%;
   height: 50%;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
+  padding: 2rem;
 `;
 
 export const ContentDownLeft = styled.div<IPrimaryColor>`
@@ -55,11 +58,17 @@ export const ContentDownLeft = styled.div<IPrimaryColor>`
   );
   border-radius: 0.5rem;
 `;
-export const ContentDownRight = styled.div`
+export const ContentDownRight = styled.div<IPrimaryColor>`
   width: 100%;
   height: 100%;
-  background-color: purple;
   border-radius: 0.5rem;
+  border: 1px solid ${(props) => props.primaryColor};
+
+  background-image: linear-gradient(
+    120deg,
+    #101010 10%,
+    ${(props) => props.primaryColor} 1000%
+  );
 `;
 
 export const ContainerDown = styled.div`
@@ -71,5 +80,22 @@ export const ContainerDown = styled.div`
 export const SideRight = styled.div`
   width: 50%;
   height: 100%;
-  /* background-color: blue; */
+  padding: 2rem;
+`;
+
+export const SideRightContent = styled.div<IPrimaryColor>`
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  border: 1px solid ${(props) => props.primaryColor};
+  background-image: linear-gradient(
+    120deg,
+    #101010 10%,
+    ${(props) => props.primaryColor} 1000%
+  );
+  border-radius: 0.5rem;
+`;
+
+export const Title = styled.p`
+  text-align: center;
 `;

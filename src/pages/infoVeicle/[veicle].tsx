@@ -119,8 +119,8 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
         gear: car.gear,
         userId: user?.id,
         extras: [extra1, extra2],
-        valueDateLocation: valueDateLocation?.toString(),
-        valueDateDevolution: valueDateDevolution?.toString(),
+        valueDateLocation: valueDateLocation?.toDateString(),
+        valueDateDevolution: valueDateDevolution?.toDateString(),
         id,
       }).then(() => {
         setIsLoading(false);
