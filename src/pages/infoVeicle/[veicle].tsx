@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   Alert,
-  Button,
   Checkbox,
   FormControlLabel,
   Snackbar,
@@ -11,13 +10,12 @@ import {
 } from "@mui/material";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { GetServerSideProps } from "next";
-import { getSession, useSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import Image from "next/image";
 import ResponsiveAppBar from "../../components/AppBar";
 import { db } from "../../firebase";
 import { ICarProps } from "../../redux/carsSlice";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-
 import {
   Container,
   Content,
@@ -118,7 +116,8 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
         seats: car.seats,
         gear: car.gear,
         userId: user?.id,
-        extras: [extra1, extra2],
+        extra1,
+        extra2,
         valueDateLocation: valueDateLocation?.toDateString(),
         valueDateDevolution: valueDateDevolution?.toDateString(),
         id,

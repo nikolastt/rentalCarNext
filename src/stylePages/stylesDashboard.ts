@@ -69,6 +69,10 @@ export const ContentDownRight = styled.div<IPrimaryColor>`
     #101010 10%,
     ${(props) => props.primaryColor} 1000%
   );
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const ContainerDown = styled.div`

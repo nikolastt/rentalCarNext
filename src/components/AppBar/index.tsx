@@ -16,8 +16,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 import { AiFillGithub } from "react-icons/ai";
-import { GetStaticProps } from "next";
-import { Router, useRouter } from "next/router";
+import { useRouter } from "next/router";
 
 const pages = [
   { name: "Home", path: "/" },
@@ -80,7 +79,6 @@ const ResponsiveAppBar = () => {
     >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          {/* <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} /> */}
           <Typography
             variant="h5"
             noWrap
@@ -140,7 +138,6 @@ const ResponsiveAppBar = () => {
               ))}
             </Menu>
           </Box>
-          {/* <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} /> */}
           <Typography
             variant="h5"
             noWrap

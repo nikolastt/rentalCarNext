@@ -1,11 +1,7 @@
 import React, { useMemo, useState } from "react";
-
 import { Container, Icon, Title, Header, Content, Input } from "./styles";
 import { FcCollapse } from "react-icons/fc";
-
 import { RootState } from "../../redux/store";
-
-// import cars from "../../repositories/cars";
 import { useDispatch, useSelector } from "react-redux";
 import { addCategory, removeCategory } from "../../redux/filterByCategorySlice";
 

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import {
   Container,
   Inputs,
@@ -11,13 +10,10 @@ import {
   BoxButton,
   TextFields,
 } from "../../stylePages/stylesAddVeicle";
-
 import Cards from "../../components/Cards/intex";
 import AppBar from "../../components/AppBar";
-
 import { db } from "../../firebase/index";
 import { collection, addDoc, getDocs } from "firebase/firestore";
-
 import TextField from "@mui/material/TextField";
 import {
   Alert,
@@ -30,7 +26,6 @@ import {
   Select,
   Snackbar,
 } from "@mui/material";
-
 import LoadingButton from "@mui/lab/LoadingButton";
 
 interface ICarProps {

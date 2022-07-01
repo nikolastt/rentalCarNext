@@ -1,9 +1,7 @@
 import React from "react";
 import { GetServerSideProps } from "next";
-import { useSession, getSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import AppBar from "../../components/AppBar";
-
-import IconInformation from "../../components/IconInformation";
 import {
   Container,
   SideLeft,
@@ -13,8 +11,6 @@ import {
 import { IUserProps } from "../Booking";
 import Image from "next/image";
 import { Button, useTheme } from "@mui/material";
-
-import { PureComponent } from "react";
 import {
   AreaChart,
   Area,
@@ -45,8 +41,6 @@ interface IData {
 
 const UserProfile: React.FC<IUser> = ({ user, arrayFavorites }) => {
   const theme = useTheme();
-
-  console.log(arrayFavorites);
 
   let dataTeste: IData[] = [];
   const data2 = () => {

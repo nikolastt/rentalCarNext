@@ -6,17 +6,13 @@ import {
   Content,
   NoFavorites,
 } from "../../stylePages/stylesBooking";
-
 import SideLeft from "../../components/SideLeft";
-
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, store } from "../../redux/store";
 import AppBar from "../../components/AppBar";
-
-import { getCars, ICarProps } from "../../redux/carsSlice";
-import { collection, getDocs, query, limit, where } from "firebase/firestore";
+import { ICarProps } from "../../redux/carsSlice";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
-
 import Pagination from "@mui/material/Pagination";
 import { Box, Button, useTheme } from "@mui/material";
 import { GetServerSideProps } from "next";

@@ -7,7 +7,6 @@ import * as React from "react";
 import ResponsiveAppBar from "../../components/AppBar";
 import Cards from "../../components/Cards/intex";
 import { db } from "../../firebase";
-import { ICarProps } from "../../redux/carsSlice";
 
 interface ICarRented {
   id?: string;

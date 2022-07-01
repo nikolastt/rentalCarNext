@@ -1,5 +1,5 @@
 import { useTheme } from "@mui/material";
-import { collection, getDocs, limit, query } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import React from "react";
@@ -8,7 +8,6 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
-  PieChart,
   PolarAngleAxis,
   PolarGrid,
   PolarRadiusAxis,
@@ -46,10 +45,13 @@ import {
 import { Pie } from "react-chartjs-2";
 import getMonthString from "../../assets/returnMonthString";
 
+import { HiCurrencyDollar } from "react-icons/hi";
+
 interface IDashboard {
   dataMostRentedVeicles: any;
   dataMostRentedCars: any;
   dataNumberOfCarsRentedInTheMonths: any;
+  totalMoney: number;
 }
 
 ChartJS.register(ArcElement, TooltipChart, LegendChart);
@@ -58,6 +60,7 @@ const Dashboard: React.FC<IDashboard> = ({
   dataMostRentedVeicles,
   dataMostRentedCars,
   dataNumberOfCarsRentedInTheMonths,
+  totalMoney,
 }) => {
   const theme = useTheme();
 
@@ -155,10 +158,16 @@ const Dashboard: React.FC<IDashboard> = ({
               </ContentDownLeft>
             </ContainerDownLeft>
             <ContainerDownRight>
-              <Title>Veículos alugados por mes</Title>
-              <ContentDownRight
-                primaryColor={theme.palette.primary.main}
-              ></ContentDownRight>
+              <Title>Total arrecadado</Title>
+              <ContentDownRight primaryColor={theme.palette.primary.main}>
+                <HiCurrencyDollar size="30%" />
+                <h2>
+                  {totalMoney.toLocaleString("pt-br", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
+                </h2>
+              </ContentDownRight>
             </ContainerDownRight>
           </ContainerDown>
         </SideLeft>
@@ -286,8 +295,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const dataMostRentedVeicles = dataMoreVeicles.slice(0, 6);
 
   const meses: number[] = [];
-
+  let totalMoney = 0;
   arrayDataVaiclesLocated.map((car) => {
+    totalMoney +=
+      Number(car.amount.replace(".", "")) +
+      Number(car.extra1) +
+      Number(car.extra2);
     const date = new Date(Date.parse(car.valueDateDevolution));
     if (!meses.includes(date.getMonth() + 1)) {
       meses.push(date.getMonth() + 1);
@@ -330,6 +343,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       dataMostRentedVeicles,
       dataMostRentedCars,
       dataNumberOfCarsRentedInTheMonths,
+      totalMoney,
     },
   };
 };
