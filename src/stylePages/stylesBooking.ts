@@ -14,3 +14,16 @@ export const Content = styled.div`
   height: 100%;
   width: 80%;
 `;
+
+export const NoFavorites = styled.div`
+  width: 100%;
+  min-height: calc(100vh - 15rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  h3 {
+    margin-bottom: 1.5rem;
+  }
+`;

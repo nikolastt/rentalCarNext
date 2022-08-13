@@ -1,7 +1,5 @@
 import React, { useMemo, useState } from "react";
-
 import { Container, Icon, Title, Header, Content, Input } from "./styles";
-
 import { FcCollapse } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
@@ -50,7 +48,6 @@ const CarSeats: React.FC<ICarSeats> = ({ isTypeFavorite }) => {
     const seatsAmount: ISeatsAmount[] = [];
 
     seats.map((seat) => {
-      const arrayAux = [];
       let count = 0;
       let seats = seat;
       cars.map((car) => {

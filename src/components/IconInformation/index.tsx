@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Container, Icon, TitleIcon, DescriptionIcon } from "./styles";
+import { Container, Icon, TitleIcon, DescriptionIcon} from "./styles";
 
 interface IIconInformationProps {
   SrcImg: string;

@@ -1,3 +1,4 @@
+import { useTheme } from "@mui/material";
 import React from "react";
 import CarSeats from "../CarSeats";
 import FilterByCategoryCollapse from "../FilterByCategoryCollapse";
@@ -9,8 +10,9 @@ interface ISideLeftProps {
 }
 
 const SideLeft: React.FC<ISideLeftProps> = ({ isTypeFavorite }) => {
+  const theme = useTheme();
   return (
-    <Container>
+    <Container primaryColor={theme.palette.primary.main}>
       <Title>Filtrar 🎯 </Title>
       <hr />
       <FilterByCategoryCollapse isTypeFavorite={isTypeFavorite} />

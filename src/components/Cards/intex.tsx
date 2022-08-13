@@ -26,6 +26,7 @@ import { addDoc, collection, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase/index";
 import { RootState } from "../../redux/store";
 import Image from "next/image";
+import Link from "next/link";
 
 interface ICardProps {
   width?: string;
@@ -60,7 +61,6 @@ const Cards: React.FC<ICardProps> = ({
   const user = useSelector((state: RootState) => state.userSlice.user);
   const [carFavorite, setCarFavorite] = useState<IDataProps>();
   const dispatch = useDispatch();
-
   const [isLoadingAddFavorites, setisLoadingAddFavorites] = useState(false);
 
   useEffect(() => {
@@ -73,7 +73,6 @@ const Cards: React.FC<ICardProps> = ({
   }, [car.model, favorites]);
 
   const addFavoriteCarBD = async () => {
-    setisLoadingAddFavorites(true);
     const ref = collection(db, "Favorites");
     await addDoc(ref, {
       model: car.model,
@@ -101,8 +100,8 @@ const Cards: React.FC<ICardProps> = ({
 
       dispatch(addFavoriteCar(data));
       setCarFavorite(data);
-      setisLoadingAddFavorites(false);
     });
+    setisLoadingAddFavorites(false);
   };
 
   const removeFavoriteCarBD = async () => {
@@ -118,25 +117,20 @@ const Cards: React.FC<ICardProps> = ({
     }
   };
 
-  const handleIcon = () => {
-    if (!isLoadingAddFavorites) {
-      setisLoadingAddFavorites(true);
-      setIsFavorite((prevState) => {
-        if (!prevState) {
-          addFavoriteCarBD();
-        } else {
-          removeFavoriteCarBD();
-        }
+  function handleIcon() {
+    setIsFavorite((prevState) => {
+      if (!prevState) {
+        addFavoriteCarBD();
+      } else {
+        removeFavoriteCarBD();
+      }
 
-        return !prevState;
-      });
-    } else {
-      console.log("Não Fez");
-    }
-  };
+      return !prevState;
+    });
+  }
 
   return (
-    <Container width={width}>
+    <Container primaryColor={theme.palette.primary.main} width={width}>
       {!car.img ? (
         <Stack spacing={1}>
           <Skeleton
@@ -150,69 +144,84 @@ const Cards: React.FC<ICardProps> = ({
         <Card className="card">
           <Card.Header className="cardHeader">
             <ContentHeader>
-              <Card.Title className="cardTitle">
-                {car.autoMaker + " "}
-                {car.model}
-              </Card.Title>
-              {isTypeFavorite ?? isLoadingAddFavorites ? (
+              <Link href={user ? `/infoVeicle/${car.id}` : "/noLogin"} passHref>
+                <Card.Title style={{ cursor: "pointer" }} className="cardTitle">
+                  {car.autoMaker + " "}
+                  {car.model}
+                </Card.Title>
+              </Link>
+              {isLoadingAddFavorites ? (
                 <IconHeaderFavoriteContainer
                   typeCursor={isLoadingAddFavorites ? "not-allowed" : "Pointer"}
                 >
                   <Spinner animation="border" variant="secondary" size="sm" />
                 </IconHeaderFavoriteContainer>
               ) : (
-                <IconHeaderFavoriteContainer onClick={handleIcon}>
-                  {isFavorite ? (
-                    <MdFavorite size={20} color="red" />
-                  ) : (
-                    <MdFavoriteBorder size={20} color="white" />
-                  )}
-                </IconHeaderFavoriteContainer>
+                isTypeFavorite ?? (
+                  <IconHeaderFavoriteContainer>
+                    {isFavorite ? (
+                      <MdFavorite
+                        size={20}
+                        color="red"
+                        onClick={() => handleIcon()}
+                      />
+                    ) : (
+                      <MdFavoriteBorder
+                        size={20}
+                        color="white"
+                        onClick={() => handleIcon()}
+                      />
+                    )}
+                  </IconHeaderFavoriteContainer>
+                )
               )}
             </ContentHeader>
           </Card.Header>
-          <CardContent>
-            <ImageContent>
-              <Image src={car.img} alt={car.amount} layout="fill" />
-            </ImageContent>
-          </CardContent>
+          <Link href={`/infoVeicle/${car.id}`} passHref>
+            <CardContent style={{ cursor: "pointer" }}>
+              <ImageContent>
+                <Image src={car.img} alt={car.amount} layout="fill" />
+              </ImageContent>
+            </CardContent>
+          </Link>
+          <Link href={`/infoVeicle/${car.id}`} passHref>
+            <Card.Footer style={{ cursor: "pointer" }} className="cardFooter">
+              <ContentFooter>
+                <SideLeftContentFooter>
+                  {car.seats ? (
+                    <Seats>
+                      <FaUser size={18} color={theme.palette.text.primary} />
+                      <p>{car.seats}</p>
+                    </Seats>
+                  ) : (
+                    ""
+                  )}
 
-          <Card.Footer className="cardFooter">
-            <ContentFooter>
-              <SideLeftContentFooter>
-                {car.seats ? (
-                  <Seats>
-                    <FaUser size={18} color={theme.palette.text.primary} />
-                    <p>{car.seats}</p>
-                  </Seats>
+                  {car.gear ? (
+                    <Gears>
+                      <GiGearStickPattern
+                        size={18}
+                        color={theme.palette.text.primary}
+                      />
+                      <strong>{car.gear == "automatico" ? "A" : "M"}</strong>
+                    </Gears>
+                  ) : (
+                    ""
+                  )}
+                </SideLeftContentFooter>
+
+                {car.amount ? (
+                  <Amount>
+                    <p>R$ </p>
+
+                    <strong>{car.amount}</strong>
+                  </Amount>
                 ) : (
                   ""
                 )}
-
-                {car.gear ? (
-                  <Gears>
-                    <GiGearStickPattern
-                      size={18}
-                      color={theme.palette.text.primary}
-                    />
-                    <strong>{car.gear == "automatico" ? "A" : "M"}</strong>
-                  </Gears>
-                ) : (
-                  ""
-                )}
-              </SideLeftContentFooter>
-
-              {car.amount ? (
-                <Amount>
-                  <p>R$ </p>
-
-                  <strong>{car.amount}</strong>
-                </Amount>
-              ) : (
-                ""
-              )}
-            </ContentFooter>
-          </Card.Footer>
+              </ContentFooter>
+            </Card.Footer>
+          </Link>
         </Card>
       )}
     </Container>
