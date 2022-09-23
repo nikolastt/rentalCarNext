@@ -1,20 +1,18 @@
+import "../styles/globals.css";
 import * as React from "react";
 import Head from "next/head";
 import { AppProps } from "next/app";
-import { ThemeProvider as ThemeProviderMUI } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import { CacheProvider, EmotionCache } from "@emotion/react";
-import theme from "../styles/themes/MUIThemes/dark";
-import createEmotionCache from "../createEmotionCache";
-
-import dark from "../styles/themes/dark";
 
 import { store } from "../redux/store";
 import { Provider } from "react-redux";
-import GlobalStyles from "../styles/GlobalStyles";
-import { ThemeProvider } from "styled-components";
 
 import { SessionProvider } from "next-auth/react";
+
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { CacheProvider, EmotionCache } from "@emotion/react";
+import createEmotionCache from "../createEmotionCache";
+import darkThemeMUI from "../styles/themeMUI";
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -28,21 +26,22 @@ export default function MyApp(
 ) {
   const { emotionCache = clientSideEmotionCache } = props;
   return (
-    <CacheProvider value={emotionCache}>
-      <Head>
-        <meta name="viewport" content="initial-scale=1, width=device-width" />
-      </Head>
-      <ThemeProviderMUI theme={theme}>
-        <ThemeProvider theme={dark}>
+    <>
+      <CacheProvider value={emotionCache}>
+        <Head>
+          <meta name="viewport" content="initial-scale=1, width=device-width" />
+        </Head>
+        <ThemeProvider theme={darkThemeMUI}>
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
+
           <Provider store={store}>
-            <GlobalStyles />
             <SessionProvider session={session}>
               <Component {...pageProps} />
             </SessionProvider>
           </Provider>
         </ThemeProvider>
-      </ThemeProviderMUI>
-    </CacheProvider>
+      </CacheProvider>
+    </>
   );
 }

@@ -3,8 +3,6 @@ import React from "react";
 import CarSeats from "../CarSeats";
 import FilterByCategoryCollapse from "../FilterByCategoryCollapse";
 
-import { Container, Title } from "./styles";
-
 interface ISideLeftProps {
   isTypeFavorite: boolean;
 }
@@ -12,12 +10,12 @@ interface ISideLeftProps {
 const SideLeft: React.FC<ISideLeftProps> = ({ isTypeFavorite }) => {
   const theme = useTheme();
   return (
-    <Container primaryColor={theme.palette.primary.main}>
-      <Title>Filtrar 🎯 </Title>
+    <div className="w-full h-full rounded-[1.5rem] p-[1rem] bg-gradient-to-br from-[#101010] to-primary-500/20 shadow   ">
+      <p className="font-bold">Filtrar 🎯 </p>
       <hr />
       <FilterByCategoryCollapse isTypeFavorite={isTypeFavorite} />
       <CarSeats isTypeFavorite={isTypeFavorite} />
-    </Container>
+    </div>
   );
 };
 

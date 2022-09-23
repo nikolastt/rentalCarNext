@@ -17,19 +17,6 @@ import { db } from "../../firebase";
 import { ICarProps } from "../../redux/carsSlice";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import {
-  Container,
-  Content,
-  SideRight,
-  ContentImage,
-  SizeImage,
-  CheckBoxArea,
-  Footer,
-  Title,
-  FooterTitle,
-  ContainerImage,
-  DatesContainer,
-} from "../../stylePages/stylesInfoVeicle";
-import {
   LoadingButton,
   LocalizationProvider,
   MobileDatePicker,
@@ -160,31 +147,31 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
   };
 
   return (
-    <Container>
+    <div>
       <ResponsiveAppBar />
       <h1>
         {car.autoMaker} {car.model}
       </h1>
-      <Content>
-        <ContainerImage>
-          <ContentImage primaryColor={theme.palette.primary.main}>
-            <SizeImage>
+      <div className="h-[calc(100vh-10rem)] w-full flex mt-[1rem]">
+        <div className="w-1/2 h-full flex justify-center items-center">
+          <div className="relative w-[80%] h-[60%] flex justify-center items-center rounded-[1.5rem] overflow-hidden border-solid border-[1px] border-primary-500 bg-red-500 shadow backdrop-blur-lg">
+            <div className="relative w-[85%] h-[75%]">
               <Image
                 alt={car.model}
                 src={car.img}
                 layout="fill"
                 quality={100}
               />
-            </SizeImage>
-          </ContentImage>
-        </ContainerImage>
+            </div>
+          </div>
+        </div>
 
-        <SideRight>
-          <Title>
+        <div className="w-1/2 ml-[1rem] p-[0.5rem]">
+          <div className="h-[10%]">
             <h2>Extras</h2>
-          </Title>
+          </div>
 
-          <CheckBoxArea>
+          <div className="flex flex-col h-[25%]">
             <FormControlLabel
               control={<Checkbox onClick={handleExtra1} />}
               label="GPS + R$50,00"
@@ -193,9 +180,9 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
               control={<Checkbox onClick={handleExtra2} />}
               label="Vidros Escuros + RS75,00"
             />
-          </CheckBoxArea>
+          </div>
 
-          <DatesContainer>
+          <div className="h-[35%]">
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <Stack spacing={3}>
                 <MobileDatePicker
@@ -215,12 +202,12 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
                 />
               </Stack>
             </LocalizationProvider>
-          </DatesContainer>
+          </div>
 
-          <Footer>
-            <FooterTitle>
+          <div className="w-full h-[20%]">
+            <h2 className="flex w-full">
               Total:{" "}
-              <span>
+              <span className="ml-auto">
                 R${" "}
                 {(
                   extra1 +
@@ -228,7 +215,7 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
                   Number(car.amount.replace(".", ""))
                 ).toLocaleString()}
               </span>
-            </FooterTitle>
+            </h2>
             <LoadingButton
               sx={{ width: "100%" }}
               onClick={reservVeicle}
@@ -237,7 +224,7 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
             >
               Reservar
             </LoadingButton>
-          </Footer>
+          </div>
           <Snackbar
             open={open}
             key={vertical + horizontal}
@@ -264,9 +251,9 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
               </Alert>
             )}
           </Snackbar>
-        </SideRight>
-      </Content>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 };
 

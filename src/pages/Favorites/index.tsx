@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Cards, { IDataProps } from "../../components/Cards/intex";
 
-import {
-  Container,
-  Content,
-  NoFavorites,
-} from "../../stylePages/stylesBooking";
 import SideLeft from "../../components/SideLeft";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, store } from "../../redux/store";
@@ -22,6 +17,7 @@ import { setUSer } from "../../redux/userSlice";
 import { LoadingButton } from "@mui/lab";
 import { FaRegSadCry } from "react-icons/fa";
 import Link from "next/link";
+import NoFavorites from "../../components/NoFavorites";
 
 interface IUserProps {
   name: string;
@@ -107,11 +103,14 @@ const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
   return (
     <>
       <AppBar />
-      <Container>
+      <div className="flex flex-col w-full bg-background rounded-md py-[1rem]">
         {carsInScreen.length > 0 ? (
           <>
-            <SideLeft isTypeFavorite={true} />
-            <Content>
+            <div className="px-6">
+              <SideLeft isTypeFavorite={true} />
+            </div>
+
+            <div className="flex flex-col px-12 mt-6">
               {carsInScreen.map((item, index) => {
                 if (index < qntCarsInScreen) {
                   return (
@@ -141,26 +140,12 @@ const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
                   {noMoreCars ? "NÃO HÁ MAIS CARROS" : "CARREGAR MAIS CARROS"}
                 </LoadingButton>
               </Box>
-            </Content>
+            </div>
           </>
         ) : (
-          <NoFavorites>
-            <h3 style={{ color: theme.palette.text.secondary }}>
-              Você não tem nenhum carro favoritado
-            </h3>
-            <FaRegSadCry size={65} color={theme.palette.text.secondary} />
-
-            <Link href="/Booking">
-              <Button
-                sx={{ marginTop: "4rem", width: "20%" }}
-                variant="contained"
-              >
-                Ir para veículos
-              </Button>
-            </Link>
-          </NoFavorites>
+          <NoFavorites />
         )}
-      </Container>
+      </div>
     </>
   );
 };

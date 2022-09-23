@@ -22,21 +22,6 @@ import ResponsiveAppBar from "../../components/AppBar";
 import { db } from "../../firebase";
 
 import {
-  Container,
-  SideLeft,
-  ContainerUp,
-  ContainerDownLeft,
-  ContentDownLeft,
-  ContentDownRight,
-  ContainerDownRight,
-  ContainerDown,
-  ContentUp,
-  SideRight,
-  SideRightContent,
-  Title,
-} from "../../stylePages/stylesDashboard";
-
-import {
   Chart as ChartJS,
   ArcElement,
   Tooltip as TooltipChart,
@@ -101,84 +86,81 @@ const Dashboard: React.FC<IDashboard> = ({
   return (
     <>
       <ResponsiveAppBar />
-      <Container>
-        <SideLeft>
-          <ContainerUp>
-            <Title>Total veículos alugados por mes</Title>
-            <ContentUp primaryColor={theme.palette.primary.main}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  width={500}
-                  height={300}
-                  data={dataNumberOfCarsRentedInTheMonths}
-                  margin={{
-                    top: 10,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                  }}
-                >
-                  <CartesianGrid stroke="white" strokeDasharray="3 3" />
-                  <XAxis dataKey="monthString" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="countCars" stackId="a" fill="#c7ad9096" />
-                </BarChart>
-              </ResponsiveContainer>
-            </ContentUp>
-          </ContainerUp>
-          <ContainerDown>
-            <ContainerDownLeft>
-              <Title>Carros mais alugados</Title>
-              <ContentDownLeft primaryColor={theme.palette.primary.main}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart
-                    cx="50%"
-                    cy="50%"
-                    outerRadius="80%"
-                    data={dataMostRentedVeicles}
-                  >
-                    <PolarGrid />
-                    <PolarAngleAxis
-                      stroke={theme.palette.primary.contrastText}
-                      dataKey="nome"
-                      color="red"
-                    />
-                    <PolarRadiusAxis color="red" />
-                    <Radar
-                      name="Mike"
-                      dataKey="quantidade"
-                      stroke="#8884d8"
-                      fill="#8884d8"
-                      fillOpacity={0.6}
-                    />
-                  </RadarChart>
-                </ResponsiveContainer>
-              </ContentDownLeft>
-            </ContainerDownLeft>
-            <ContainerDownRight>
-              <Title>Total arrecadado</Title>
-              <ContentDownRight primaryColor={theme.palette.primary.main}>
-                <HiCurrencyDollar size="30%" />
-                <h2>
-                  {totalMoney.toLocaleString("pt-br", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </h2>
-              </ContentDownRight>
-            </ContainerDownRight>
-          </ContainerDown>
-        </SideLeft>
 
-        <SideRight>
-          <Title>Categorias mais alugadas</Title>
-          <SideRightContent primaryColor={theme.palette.primary.main}>
+      <div className="w-full min-h-screen px-3 ">
+        <p className="text-center">Total veículos alugados por mes</p>
+        <div className="w-full h-[300px]  rounded-xl border-solid border-[1px] border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20  ">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              width={500}
+              height={300}
+              data={dataNumberOfCarsRentedInTheMonths}
+              margin={{
+                top: 10,
+                right: 20,
+                left: 0,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid stroke="white" strokeDasharray="3 3" />
+              <XAxis dataKey="monthString" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="countCars" stackId="a" fill="#c7ad9096" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="w-full  mt-12  ">
+          <p className="text-center">Carros mais alugados</p>
+          <div className=" w-full h-[4s00px] border-solid border-[1px] border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20 rounded-xl  ">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart
+                cx="50%"
+                cy="50%"
+                outerRadius="80%"
+                data={dataMostRentedVeicles}
+              >
+                <PolarGrid />
+                <PolarAngleAxis
+                  stroke={theme.palette.primary.contrastText}
+                  dataKey="nome"
+                  color="red"
+                />
+                <PolarRadiusAxis color="red" />
+                <Radar
+                  name="Mike"
+                  dataKey="quantidade"
+                  stroke="#8884d8"
+                  fill="#8884d8"
+                  fillOpacity={0.6}
+                />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="w-full  mt-12">
+          <p className="text-center">Total arrecadado</p>
+          <div className="w-full h-[150px]  border-solid border-[1px] border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20 rounded-xl flex flex-col justify-center items-center ">
+            <HiCurrencyDollar size="30%" />
+            <h2 className="mt-3">
+              {totalMoney.toLocaleString("pt-br", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </h2>
+          </div>
+        </div>
+
+        <div className="w-full h-full mt-12 pb-12 ">
+          <p className="text-center">Categorias mais alugadas</p>
+          <div className="w-full h-[500px] p-[1rem] border-solid border-[1px] border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20 rounded-xl">
             <Pie data={data} options={{ maintainAspectRatio: false }} />
-          </SideRightContent>
-        </SideRight>
-      </Container>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

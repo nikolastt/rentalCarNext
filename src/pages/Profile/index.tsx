@@ -2,12 +2,7 @@ import React from "react";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import AppBar from "../../components/AppBar";
-import {
-  Container,
-  SideLeft,
-  SideRight,
-  ContentImage,
-} from "../../stylePages/stylesProfile";
+
 import { IUserProps } from "../Booking";
 import Image from "next/image";
 import { Button, useTheme } from "@mui/material";
@@ -26,8 +21,9 @@ import { db } from "../../firebase";
 import { ICarProps } from "../../redux/carsSlice";
 import { FaRegSadCry } from "react-icons/fa";
 import Link from "next/link";
-import { NoFavorites } from "../../stylePages/stylesBooking";
 import { AiOutlineArrowRight } from "react-icons/ai";
+import { AiOutlineWarning } from "react-icons/ai";
+import NoFavorites from "../../components/NoFavorites";
 
 interface IUser {
   user: IUserProps;
@@ -57,26 +53,27 @@ const UserProfile: React.FC<IUser> = ({ user, arrayFavorites }) => {
   return (
     <>
       <AppBar />
-      <Container>
-        <SideLeft primaryColor={theme.palette.primary.main}>
-          <ContentImage>
-            <Image src={user.image} alt={"Avatar do usuário"} layout="fill" />
-          </ContentImage>
+      <div className="w-full h-[calc(100vh-8rem)]  ">
+        <div className="flex  items-center px-3 w-full">
+          <div className="w-[76px] h-[76px] bg-primary-500 flex items-center justify-center rounded-full">
+            <div className="relative w-[70px] h-[70px] overflow-hidden  rounded-full ">
+              <Image src={user.image} alt={"Avatar do usuário"} layout="fill" />
+            </div>
+          </div>
 
-          <h3>{user.name}</h3>
+          <div className="flex flex-grow items-center">
+            <h3 className=" ml-3">Olá, {user.name}</h3>
 
-          <p>Identificamos que você é um adiministrador</p>
-          <Link href="/Dashboard">
-            <Button>
-              Ir para dashboard!
-              <AiOutlineArrowRight style={{ marginLeft: "0.5rem" }} size={20} />
-            </Button>
-          </Link>
-        </SideLeft>
+            <button className="ml-auto px-12 py-1 border-solid border-[1px] border-primary-500 rounded-md hover:scale-105 ease-in duration-200">
+              Sair
+            </button>
+          </div>
+        </div>
 
         {arrayFavorites.length > 0 ? (
-          <SideRight>
+          <div className=" mt-12 w-full h-[400px] flex flex-col items-center ">
             <h2>VEÍCULOS FAVORITOS</h2>
+
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 width={500}
@@ -101,25 +98,26 @@ const UserProfile: React.FC<IUser> = ({ user, arrayFavorites }) => {
                 />
               </AreaChart>
             </ResponsiveContainer>
-          </SideRight>
+          </div>
         ) : (
-          <NoFavorites>
-            <h3 style={{ color: theme.palette.text.secondary }}>
-              Você não tem nenhum carro favoritado
-            </h3>
-            <FaRegSadCry size={65} color={theme.palette.text.secondary} />
-
-            <Link href="/Booking">
-              <Button
-                sx={{ marginTop: "4rem", width: "20%" }}
-                variant="contained"
-              >
-                Ir para veículos
-              </Button>
-            </Link>
-          </NoFavorites>
+          <div className="mt-36">
+            <NoFavorites />
+          </div>
         )}
-      </Container>
+        <div className="mt-12 mx-auto  w-full flex flex-col items-center">
+          <p className="text-center m-0 h-[20%] flex items-center ">
+            <AiOutlineWarning size={30} className="text-primary-500 mr-1" />
+            Identificamos que você é um adiministrador
+          </p>
+
+          <Link href="/Dashboard">
+            <button className="flex mt-6 border-solid border-[1px] border-primary-500 py-2 px-12 rounded-md hover:scale-105 ease-in duration-200">
+              Ir para dashboard!
+              <AiOutlineArrowRight style={{ marginLeft: "0.5rem" }} size={20} />
+            </button>
+          </Link>
+        </div>
+      </div>
     </>
   );
 };

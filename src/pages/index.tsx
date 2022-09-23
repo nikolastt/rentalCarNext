@@ -1,21 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-
-import "bootstrap/dist/css/bootstrap.min.css";
-import React from "react";
-
-import {
-  Container,
-  Title,
-  PageHeader,
-  Img,
-  Gradient,
-  SectionAdvantage,
-  TitleSectionAdvantage,
-  ContentSectionAdvantage,
-  SideLeft,
-  InfoDate,
-} from "../stylePages/stylesPageServices";
+import React, { useEffect, useState } from "react";
 
 import "swiper/css";
 import "swiper/css/effect-cube";
@@ -27,6 +12,7 @@ import { EffectCoverflow, Navigation, Pagination, Autoplay } from "swiper";
 import Cards from "../components/Cards/intex";
 import IconInformation from "../components/IconInformation";
 import AppBar from "../components/AppBar";
+
 import {
   collection,
   getDocs,
@@ -35,11 +21,13 @@ import {
   query,
   startAfter,
 } from "firebase/firestore";
+
 import { db } from "../firebase";
 import { ICarProps } from "../redux/carsSlice";
 import Image from "next/image";
 import veicleHomePage from "../../public/images/veicleHomePage.png";
 import { GetStaticProps } from "next";
+import GradientHomePage from "../components/GradientHomePage";
 
 interface IHome {
   featuredCars: ICarProps[];
@@ -50,84 +38,91 @@ const Home: NextPage<IHome> = ({ featuredCars }) => {
     <title>Rental Car</title>
   </Head>;
 
+  const [sizeWindow, setSizeWindow] = useState(0);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setSizeWindow(window.innerWidth);
+    }
+  }, []);
+
   return (
     <>
-      <AppBar />
-      <Container>
-        <PageHeader>
-          <SideLeft>
-            <Title>
-              Alugue Seu <br />
-              Veículo
-            </Title>
+      <div>
+        <AppBar />
 
-            <InfoDate>
-              <h1>
-                Datas para alugar o carro <br />
-                (a ser implementada){" "}
-              </h1>
-            </InfoDate>
-          </SideLeft>
+        <div className={` h-[calc(100vh-79px)] w-full `}>
+          <div className="container ">
+            <h1 className="text-center lg:text-left lg:absolute  ]">
+              Alugue Seu Veículo
+            </h1>
 
-          <Img>
-            <Gradient></Gradient>
-            <Image src={veicleHomePage} alt="Veicle home page" />
-          </Img>
-        </PageHeader>
+            <div className="relative w-[90%] max-w-[500px]  mx-auto h-44 mt-16 lg:ml-auto lg:mx-0 lg:h-80 lg:max-w-[700px] ">
+              <div className="absolute right-1/4 -top-10">
+                <GradientHomePage />
+              </div>
+              <Image src={veicleHomePage} alt="veículo" layout="fill" />
+            </div>
+          </div>
 
-        <Swiper
-          effect={"coverflow"}
-          grabCursor={true}
-          centeredSlides={true}
-          slidesPerView={2}
-          coverflowEffect={{
-            rotate: 50,
-            stretch: 0,
-            depth: 50,
-            modifier: 1,
-            slideShadows: false,
-          }}
-          pagination={true}
-          navigation={true}
-          autoplay={{
-            delay: 2500,
-            disableOnInteraction: true,
-          }}
-          modules={[EffectCoverflow, Pagination, Navigation, Autoplay]}
-          className="mySwiper"
-        >
-          {featuredCars?.map((car, index) => {
-            return (
-              <SwiperSlide key={car.model + index}>
-                <Cards car={car} isTypeFavorite={false} />
-              </SwiperSlide>
-            );
-          })}
-        </Swiper>
+          <div className="mt-12  ">
+            <Swiper
+              effect={"coverflow"}
+              grabCursor={true}
+              centeredSlides={true}
+              slidesPerView={sizeWindow > 830 ? 2.3 : 1.3}
+              coverflowEffect={{
+                rotate: 50,
+                stretch: 0,
+                depth: 50,
+                modifier: 1,
+                slideShadows: false,
+              }}
+              pagination={true}
+              navigation={true}
+              autoplay={{
+                delay: 2500,
+                disableOnInteraction: true,
+              }}
+              modules={[EffectCoverflow, Pagination, Navigation, Autoplay]}
+              className="mySwiper"
+            >
+              {featuredCars?.map((car, index) => {
+                return (
+                  <SwiperSlide className="pt-6 pb-6" key={car.model + index}>
+                    <Cards car={car} isTypeFavorite={false} />
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
+          </div>
 
-        <SectionAdvantage>
-          <TitleSectionAdvantage>Nossas Vantagens</TitleSectionAdvantage>
-          <ContentSectionAdvantage>
-            <IconInformation
-              Title="+50 CARROS"
-              Description="Mais de 50 carros com categorias diferentes"
-              SrcImg="images/carro-eletrico.png"
-            />
+          <section className="flex flex-col items-center container ">
+            <h1 className="mt-24 text-center">Nossas Vantagens</h1>
 
-            <IconInformation
-              Title="PREÇOS BAIXOS"
-              Description="Promoções imperdíveis"
-              SrcImg="images/low-price.png"
-            />
+            <div className=" grid sm:grid-cols-2 md:grid-cols-3 lg:space-x-6 mt-12s   ">
+              <IconInformation
+                Title="+50 CARROS"
+                Description="Mais de 50 carros com categorias diferentes"
+                SrcImg="/images/carro-eletrico.png"
+              />
 
-            <IconInformation
-              Title="SUPORTE 24 HORAS"
-              Description="Suporte disponível 24 horas, para dúvidas."
-              SrcImg="images/customer-service.png"
-            />
-          </ContentSectionAdvantage>
-        </SectionAdvantage>
-      </Container>
+              <IconInformation
+                Title="PREÇOS BAIXOS"
+                Description="Promoções imperdíveis"
+                SrcImg="/images/low-price.png"
+              />
+
+              <IconInformation
+                Title="SUPORTE 24 HORAS"
+                Description="Suporte disponível 24 horas, para dúvidas."
+                SrcImg="/images/customer-service.png"
+                className="sm:col-span-2 flex min-w-full md:col-span-1 "
+              />
+            </div>
+          </section>
+        </div>
+      </div>
     </>
   );
 };

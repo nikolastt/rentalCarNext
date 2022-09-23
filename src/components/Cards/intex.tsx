@@ -1,24 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Card, Spinner } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import { FaUser } from "react-icons/fa";
 import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
 import { GiGearStickPattern } from "react-icons/gi";
 
-import "bootstrap/dist/css/bootstrap.min.css";
-
-import {
-  Container,
-  ContentFooter,
-  ContentHeader,
-  IconHeaderFavoriteContainer,
-  Amount,
-  SideLeftContentFooter,
-  Gears,
-  Seats,
-  CardContent,
-  ImageContent,
-} from "./styles";
-import { Skeleton, Stack, useTheme } from "@mui/material";
 import { addFavoriteCar, removeFavoriteCar } from "../../redux/favoriteslice";
 import { ICarProps } from "../../redux/carsSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,6 +19,7 @@ interface ICardProps {
   car: ICarProps;
   setFavorite?: boolean;
   favorites?: IDataProps[];
+  isTypeAddCar?: boolean;
 }
 
 export interface IDataProps {
@@ -55,9 +41,9 @@ const Cards: React.FC<ICardProps> = ({
   car,
   setFavorite,
   favorites,
+  isTypeAddCar,
 }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(setFavorite || false);
-  const theme = useTheme();
   const user = useSelector((state: RootState) => state.userSlice.user);
   const [carFavorite, setCarFavorite] = useState<IDataProps>();
   const dispatch = useDispatch();
@@ -130,101 +116,105 @@ const Cards: React.FC<ICardProps> = ({
   }
 
   return (
-    <Container primaryColor={theme.palette.primary.main} width={width}>
-      {!car.img ? (
-        <Stack spacing={1}>
-          <Skeleton
-            variant="rectangular"
-            width={295}
-            sx={{ borderRadius: "1rem" }}
-            height={230}
-          />
-        </Stack>
-      ) : (
-        <Card className="card">
-          <Card.Header className="cardHeader">
-            <ContentHeader>
-              <Link href={user ? `/infoVeicle/${car.id}` : "/noLogin"} passHref>
-                <Card.Title style={{ cursor: "pointer" }} className="cardTitle">
-                  {car.autoMaker + " "}
-                  {car.model}
-                </Card.Title>
-              </Link>
-              {isLoadingAddFavorites ? (
-                <IconHeaderFavoriteContainer
-                  typeCursor={isLoadingAddFavorites ? "not-allowed" : "Pointer"}
+    <div className="w-full h-[250px] max-w-[650px]">
+      <div className="h-[87%] w-full rounded-lg border-[1px] border-solid border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20 shadow-lg p-3">
+        <div className="h-[15%] bg-transparent">
+          <div className="flex">
+            <Link href={user ? `/infoVeicle/${car.id}` : "/noLogin"} passHref>
+              <div className="">
+                {car.autoMaker + " "}
+                {car.model}
+              </div>
+            </Link>
+
+            {isLoadingAddFavorites ? (
+              <div
+                className={`ml-auto ${
+                  isLoadingAddFavorites ? "cursor-not-allowed" : "cursor-poiter"
+                }`}
+              >
+                <Spinner animation="border" variant="secondary" size="sm" />
+              </div>
+            ) : (
+              isTypeFavorite ?? (
+                <div
+                  className={`ml-auto ${
+                    isLoadingAddFavorites
+                      ? "cursor-not-allowed"
+                      : "cursor-poiter"
+                  }`}
                 >
-                  <Spinner animation="border" variant="secondary" size="sm" />
-                </IconHeaderFavoriteContainer>
+                  {isFavorite ? (
+                    <MdFavorite
+                      size={20}
+                      color="red"
+                      onClick={() => handleIcon()}
+                    />
+                  ) : (
+                    <MdFavoriteBorder
+                      size={20}
+                      color="white"
+                      onClick={() => handleIcon()}
+                    />
+                  )}
+                </div>
+              )
+            )}
+          </div>
+        </div>
+        <Link href={`/infoVeicle/${car.id}`} passHref>
+          <div className="w-full h-3/4 flex justify-center items-center">
+            <div className="w-3/4 h-[90%] max-w-[250px] relative">
+              {isTypeAddCar ? (
+                <img src={car.img} alt={car.amount} />
               ) : (
-                isTypeFavorite ?? (
-                  <IconHeaderFavoriteContainer>
-                    {isFavorite ? (
-                      <MdFavorite
-                        size={20}
-                        color="red"
-                        onClick={() => handleIcon()}
-                      />
-                    ) : (
-                      <MdFavoriteBorder
-                        size={20}
-                        color="white"
-                        onClick={() => handleIcon()}
-                      />
-                    )}
-                  </IconHeaderFavoriteContainer>
-                )
-              )}
-            </ContentHeader>
-          </Card.Header>
-          <Link href={`/infoVeicle/${car.id}`} passHref>
-            <CardContent style={{ cursor: "pointer" }}>
-              <ImageContent>
                 <Image src={car.img} alt={car.amount} layout="fill" />
-              </ImageContent>
-            </CardContent>
-          </Link>
-          <Link href={`/infoVeicle/${car.id}`} passHref>
-            <Card.Footer style={{ cursor: "pointer" }} className="cardFooter">
-              <ContentFooter>
-                <SideLeftContentFooter>
-                  {car.seats ? (
-                    <Seats>
-                      <FaUser size={18} color={theme.palette.text.primary} />
-                      <p>{car.seats}</p>
-                    </Seats>
-                  ) : (
-                    ""
-                  )}
-
-                  {car.gear ? (
-                    <Gears>
-                      <GiGearStickPattern
-                        size={18}
-                        color={theme.palette.text.primary}
-                      />
-                      <strong>{car.gear == "automatico" ? "A" : "M"}</strong>
-                    </Gears>
-                  ) : (
-                    ""
-                  )}
-                </SideLeftContentFooter>
-
-                {car.amount ? (
-                  <Amount>
-                    <p>R$ </p>
-
-                    <strong>{car.amount}</strong>
-                  </Amount>
+              )}
+            </div>
+          </div>
+        </Link>
+        <Link href={`/infoVeicle/${car.id}`} passHref>
+          <div className=" h-[15%] ">
+            <div className="flex">
+              <div className="w-[60%] flex">
+                {car.seats ? (
+                  <div className="w-[30%] flex mr-[1rem] ">
+                    <FaUser size={18} className="text-primary-500" />
+                    <p className="ml-[0.5rem]">{car.seats}</p>
+                  </div>
                 ) : (
                   ""
                 )}
-              </ContentFooter>
-            </Card.Footer>
-          </Link>
-        </Card>
-      )}
-    </Container>
+
+                {car.gear ? (
+                  <div className="w-[30%] flex ">
+                    <GiGearStickPattern
+                      className="text-primary-500"
+                      size={18}
+                    />
+                    <strong className="ml-[0.5rem]">
+                      {car.gear == "automatico" ? "A" : "M"}
+                    </strong>
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
+
+              {car.amount ? (
+                <div className="w-[40%] ml-auto flex items-start justify-end ">
+                  <p>R$ </p>
+
+                  <strong className="ml-[0.5rem]">{car.amount}</strong>
+                </div>
+              ) : (
+                ""
+              )}
+            </div>
+          </div>
+        </Link>
+      </div>
+    </div>
   );
 };
 

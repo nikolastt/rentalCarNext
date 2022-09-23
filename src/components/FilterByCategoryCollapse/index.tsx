@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import { Container, Icon, Title, Header, Content, Input } from "./styles";
 import { FcCollapse } from "react-icons/fc";
 import { RootState } from "../../redux/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -89,21 +88,26 @@ const FilterByCategoryCollapse: React.FC<IFilterByCategoryCollapseProps> = ({
   }
 
   return (
-    <Container>
-      <Header onClick={() => handleCollapse()}>
-        <Title>Car Filter</Title>
-        <Icon isCollapseUp={isCollapseUp}>
+    <div className="mb-[1rem]">
+      <div className="flex cursor-pointer" onClick={() => handleCollapse()}>
+        <p className="flex items-center m-0">Car Filter</p>
+        <div
+          className={`flex items-center transition-all ${
+            isCollapseUp ? "" : "rotate-180"
+          } ml-auto cursor-pointer`}
+        >
           <FcCollapse />
-        </Icon>
-      </Header>
+        </div>
+      </div>
       {isCollapseUp ? (
         ""
       ) : (
-        <Content>
+        <div className="flex flex-col p-[1rem]">
           {categoryes.map((item, index) => {
             return (
-              <Input key={index}>
+              <div className="mb-[0.5rem]" key={index}>
                 <input
+                  className="mr-[0.5rem]"
                   type="checkbox"
                   onChange={(e) => {
                     {
@@ -122,12 +126,12 @@ const FilterByCategoryCollapse: React.FC<IFilterByCategoryCollapseProps> = ({
                     }
                   })}
                 </label>
-              </Input>
+              </div>
             );
           })}
-        </Content>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 

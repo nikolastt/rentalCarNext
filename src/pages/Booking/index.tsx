@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Cards, { IDataProps } from "../../components/Cards/intex";
-import { Container, Content } from "../../stylePages/stylesBooking";
 import SideLeft from "../../components/SideLeft";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../redux/store";
@@ -98,11 +97,13 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
   return (
     <>
       <AppBar />
-      <Container>
-        <SideLeft isTypeFavorite={false} />
+      <div className="flex flex-col w-full bg-background rounded-md py-[1rem]">
+        <div className="px-6">
+          <SideLeft isTypeFavorite={false} />
+        </div>
 
         {carsInScreen.length > 0 ? (
-          <Content>
+          <div className="flex flex-col px-12 mt-6 ">
             {carsInScreen.map((item, index) => {
               if (index < qntCarsInScreen) {
                 return (
@@ -133,13 +134,13 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
                 {noMoreCars ? "NÃO HÁ MAIS CARROS" : "CARREGAR MAIS CARROS"}
               </LoadingButton>
             </Box>
-          </Content>
+          </div>
         ) : (
-          <Content>
+          <div>
             <h1>Carregando</h1>
-          </Content>
+          </div>
         )}
-      </Container>
+      </div>
     </>
   );
 };
@@ -159,10 +160,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   }
 
   const user = {
-    name: session.user?.name,
-    email: session.user?.email,
-    image: session.user?.image,
-    id: session.id,
+    name: session?.user?.name,
+    email: session?.user?.email,
+    image: session?.user?.image,
+    id: session?.id,
   };
 
   const state = store.getState();
