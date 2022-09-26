@@ -36,7 +36,6 @@ export interface IDataProps {
 }
 
 const Cards: React.FC<ICardProps> = ({
-  width,
   isTypeFavorite,
   car,
   setFavorite,

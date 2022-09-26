@@ -16,13 +16,9 @@ import ResponsiveAppBar from "../../components/AppBar";
 import { db } from "../../firebase";
 import { ICarProps } from "../../redux/carsSlice";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import {
-  LoadingButton,
-  LocalizationProvider,
-  MobileDatePicker,
-} from "@mui/lab";
-
-import { useTheme } from "@mui/material";
+import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
+import { LoadingButton } from "@mui/lab";
+import { useRouter } from "next/router";
 
 interface IUserProps {
   name: string;
@@ -49,7 +45,7 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const theme = useTheme();
+  const router = useRouter();
 
   const [state, setState] = React.useState<State>({
     open: false,
@@ -117,6 +113,7 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
           },
           { openSuccess: true }
         );
+        router.push("/RentedCars");
       });
     } catch {
       setIsLoading(false);
@@ -149,12 +146,12 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
   return (
     <div>
       <ResponsiveAppBar />
-      <h1>
+      <h1 className="text-center">
         {car.autoMaker} {car.model}
       </h1>
-      <div className="h-[calc(100vh-10rem)] w-full flex mt-[1rem]">
-        <div className="w-1/2 h-full flex justify-center items-center">
-          <div className="relative w-[80%] h-[60%] flex justify-center items-center rounded-[1.5rem] overflow-hidden border-solid border-[1px] border-primary-500 bg-red-500 shadow backdrop-blur-lg">
+      <div className="h-[calc(100vh-10rem)] w-full flex flex-col mt-[1rem]">
+        <div className="w-full flex justify-center items-center px-3">
+          <div className="relative w-[400px] h-[300px] flex justify-center items-center rounded-[1.5rem] overflow-hidden border-solid border-[1px] border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20 shadow backdrop-blur-lg">
             <div className="relative w-[85%] h-[75%]">
               <Image
                 alt={car.model}
@@ -166,12 +163,10 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
           </div>
         </div>
 
-        <div className="w-1/2 ml-[1rem] p-[0.5rem]">
-          <div className="h-[10%]">
-            <h2>Extras</h2>
-          </div>
+        <div className="w-full mt-6 p-[0.5rem] px-3">
+          <h2>Extras</h2>
 
-          <div className="flex flex-col h-[25%]">
+          <div className="flex flex-col ">
             <FormControlLabel
               control={<Checkbox onClick={handleExtra1} />}
               label="GPS + R$50,00"
@@ -182,29 +177,33 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
             />
           </div>
 
-          <div className="h-[35%]">
+          <div className="w-full  mt-6 ">
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <Stack spacing={3}>
-                <MobileDatePicker
-                  label="Data da locação"
-                  inputFormat="dd/MM/yyyy"
-                  value={valueDateLocation}
-                  onChange={handleChangeDataLocation}
-                  renderInput={(params) => <TextField {...params} />}
-                />
+                <div className="flex justify-between gap-6">
+                  <MobileDatePicker
+                    label="Data da locação"
+                    inputFormat="dd/MM/yyyy"
+                    value={valueDateLocation}
+                    onChange={handleChangeDataLocation}
+                    renderInput={(params: any) => <TextField {...params} />}
+                    className="w-1/2"
+                  />
 
-                <MobileDatePicker
-                  label="Data da devolução"
-                  inputFormat="dd/MM/yyyy"
-                  value={valueDateDevolution}
-                  onChange={handleChangeDataDevolution}
-                  renderInput={(params) => <TextField {...params} />}
-                />
+                  <MobileDatePicker
+                    label="Data da devolução"
+                    inputFormat="dd/MM/yyyy"
+                    value={valueDateDevolution}
+                    onChange={handleChangeDataDevolution}
+                    renderInput={(params: any) => <TextField {...params} />}
+                    className="w-1/2"
+                  />
+                </div>
               </Stack>
             </LocalizationProvider>
           </div>
 
-          <div className="w-full h-[20%]">
+          <div className="w-full mt-6">
             <h2 className="flex w-full">
               Total:{" "}
               <span className="ml-auto">
@@ -216,43 +215,37 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
                 ).toLocaleString()}
               </span>
             </h2>
-            <LoadingButton
-              sx={{ width: "100%" }}
-              onClick={reservVeicle}
-              loading={isLoading}
-              variant="outlined"
-            >
-              Reservar
-            </LoadingButton>
+            <div className="mt-6">
+              <LoadingButton
+                sx={{ width: "100%" }}
+                onClick={reservVeicle}
+                loading={isLoading}
+                variant="outlined"
+              >
+                Reservar
+              </LoadingButton>
+            </div>
           </div>
-          <Snackbar
-            open={open}
-            key={vertical + horizontal}
-            anchorOrigin={{ vertical, horizontal }}
-            autoHideDuration={5000}
-            onClose={handleClose}
-            sx={{ marginTop: "65vh" }}
-          >
-            {openError ? (
-              <Alert
-                onClose={handleClose}
-                severity="error"
-                sx={{ width: "100%" }}
-              >
-                Ocorreu um erro ao cadastrar o veículo!
-              </Alert>
-            ) : (
-              <Alert
-                onClose={handleClose}
-                severity="success"
-                sx={{ width: "100%" }}
-              >
-                Veículo reservado com sucesso!
-              </Alert>
-            )}
-          </Snackbar>
         </div>
       </div>
+      <Snackbar
+        open={open}
+        key={vertical + horizontal}
+        anchorOrigin={{ vertical, horizontal }}
+        autoHideDuration={5000}
+        onClose={handleClose}
+        sx={{ marginTop: "10vh" }}
+      >
+        {openError ? (
+          <Alert onClose={handleClose} severity="error" sx={{ width: "75%" }}>
+            Ocorreu um erro ao cadastrar o veículo!
+          </Alert>
+        ) : (
+          <Alert onClose={handleClose} severity="success" sx={{ width: "75%" }}>
+            Veículo reservado com sucesso!
+          </Alert>
+        )}
+      </Snackbar>
     </div>
   );
 };

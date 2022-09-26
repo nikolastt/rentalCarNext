@@ -3,8 +3,6 @@ import { FaRegSadCry } from "react-icons/fa";
 
 import Link from "next/link";
 
-// import { Container } from './styles';
-
 const NoFavorites: React.FC = () => {
   return (
     <div className="w-full min-h-[calc(100vh-15rem) flex flex-col items-center justify-center  ]">

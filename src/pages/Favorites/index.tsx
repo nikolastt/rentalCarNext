@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Cards, { IDataProps } from "../../components/Cards/intex";
-
 import SideLeft from "../../components/SideLeft";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, store } from "../../redux/store";
@@ -8,15 +7,12 @@ import AppBar from "../../components/AppBar";
 import { ICarProps } from "../../redux/carsSlice";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
-import Pagination from "@mui/material/Pagination";
-import { Box, Button, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import { setFavoriteCars } from "../../redux/favoriteslice";
 import { setUSer } from "../../redux/userSlice";
 import { LoadingButton } from "@mui/lab";
-import { FaRegSadCry } from "react-icons/fa";
-import Link from "next/link";
 import NoFavorites from "../../components/NoFavorites";
 
 interface IUserProps {
@@ -51,8 +47,6 @@ const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
       setnoMoreCars(true);
     }
   };
-
-  const theme = useTheme();
 
   useEffect(() => {
     if (!userStore.email) {

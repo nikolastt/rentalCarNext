@@ -1,4 +1,3 @@
-import { useTheme } from "@mui/material";
 import React from "react";
 import CarSeats from "../CarSeats";
 import FilterByCategoryCollapse from "../FilterByCategoryCollapse";
@@ -8,7 +7,6 @@ interface ISideLeftProps {
 }
 
 const SideLeft: React.FC<ISideLeftProps> = ({ isTypeFavorite }) => {
-  const theme = useTheme();
   return (
     <div className="w-full h-full rounded-[1.5rem] p-[1rem] bg-gradient-to-br from-[#101010] to-primary-500/20 shadow   ">
       <p className="font-bold">Filtrar 🎯 </p>

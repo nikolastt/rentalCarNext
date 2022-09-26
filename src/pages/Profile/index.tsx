@@ -5,7 +5,7 @@ import AppBar from "../../components/AppBar";
 
 import { IUserProps } from "../Booking";
 import Image from "next/image";
-import { Button, useTheme } from "@mui/material";
+import { useTheme } from "@mui/material";
 import {
   AreaChart,
   Area,
@@ -19,7 +19,6 @@ import { store } from "../../redux/store";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
 import { ICarProps } from "../../redux/carsSlice";
-import { FaRegSadCry } from "react-icons/fa";
 import Link from "next/link";
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { AiOutlineWarning } from "react-icons/ai";

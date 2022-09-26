@@ -13,19 +13,9 @@ import { BsPerson } from "react-icons/bs";
 import { useRouter } from "next/router";
 import ItemMenuSideBar from "../ItemMenuSideBar";
 
-const pages = [
-  { name: "Home", path: "/" },
-  { name: "Veículos", path: "/Booking" },
-  { name: "Meus Favoritos", path: "/Favorites" },
-  { name: "Adicionar Veículo", path: "/AddVeicle" },
-];
-const settings = ["Perfil", "Carros alugados", "Sair"];
-
 const ResponsiveAppBar = () => {
   const router = useRouter();
   const path = router.pathname.split("/")[1];
-
-  const { data: session } = useSession();
 
   const [menuIsOpen, setMenuIsOpen] = React.useState(false);
 
@@ -132,173 +122,10 @@ const ResponsiveAppBar = () => {
       <div
         className={` ${
           !menuIsOpen && "hidden"
-        } fixed left-0 bottom-0 min-w-[calc(100%)] backdrop-blur-sm h-full ease-out duration-300 z-10 lg:hidden`}
+        } fixed left-0 bottom-0 min-w-[calc(100%)] bg-black/75 h-full ease-out duration-300 z-10 lg:hidden`}
         onClick={() => setMenuIsOpen(!menuIsOpen)}
       ></div>
     </>
-    // <AppBar
-    //   position="static"
-    //   color="transparent"
-    //   sx={{ boxShadow: "none", mb: "1.5rem" }}
-    //   enableColorOnDark
-    // >
-    //   <Container maxWidth="xl">
-    //     <Toolbar disableGutters>
-    //       <Typography
-    //         variant="h5"
-    //         noWrap
-    //         component="a"
-    //         href="/"
-    //         sx={{
-    //           mr: 2,
-    //           display: { xs: "none", md: "flex" },
-    //           fontFamily: "Lora",
-    //           fontWeight: 900,
-    //           letterSpacing: ".3rem",
-    //           color: "primary.main",
-    //           textDecoration: "none",
-
-    //           "&:hover": {
-    //             color: "primary.main",
-    //             filter: "brightness(0.8)",
-    //           },
-    //         }}
-    //       >
-    //         10Loca
-    //       </Typography>
-
-    //       <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-    //         <IconButton
-    //           size="large"
-    //           aria-label="account of current user"
-    //           aria-controls="menu-appbar"
-    //           aria-haspopup="true"
-    //           onClick={handleOpenNavMenu}
-    //           sx={{ color: "text.primary" }}
-    //         >
-    //           <MenuIcon />
-    //         </IconButton>
-    //         <Menu
-    //           id="menu-appbar"
-    //           anchorEl={anchorElNav}
-    //           anchorOrigin={{
-    //             vertical: "bottom",
-    //             horizontal: "left",
-    //           }}
-    //           keepMounted
-    //           transformOrigin={{
-    //             vertical: "top",
-    //             horizontal: "left",
-    //           }}
-    //           open={Boolean(anchorElNav)}
-    //           onClose={handleCloseNavMenu}
-    //           sx={{
-    //             display: { xs: "block", md: "none" },
-    //           }}
-    //         >
-    //           {pages.map((page) => (
-    //             <MenuItem key={page.name} onClick={handleCloseNavMenu}>
-    //               <Typography textAlign="center">{page.name}</Typography>
-    //             </MenuItem>
-    //           ))}
-    //         </Menu>
-    //       </Box>
-    //       <Typography
-    //         variant="h5"
-    //         noWrap
-    //         component="a"
-    //         href="/"
-    //         sx={{
-    //           mr: 2,
-    //           display: { xs: "flex", md: "none" },
-    //           flexGrow: 1,
-    //           fontFamily: "monospace",
-    //           fontWeight: 900,
-    //           letterSpacing: ".3rem",
-    //           color: "primary.main",
-    //           textDecoration: "none",
-
-    //           "&:hover": {
-    //             color: "primary.main",
-    //             filter: "brightness(0.8)",
-    //           },
-    //         }}
-    //       >
-    //         Perfect Wheels
-    //       </Typography>
-    //       <Box
-    //         sx={{
-    //           flexGrow: 1,
-    //           display: { xs: "none", md: "flex" },
-    //           justifyContent: "flex-end",
-    //         }}
-    //       >
-    //         {pages.map((page) => (
-    //           <Button
-    //             key={page.name}
-    //             onClick={handleCloseNavMenu}
-    //             sx={{ my: 2, mr: "1rem", color: "white", display: "block" }}
-    //           >
-    //             <Link
-    //               href={page.path}
-    //               style={{ color: "white", textDecoration: "none" }}
-    //             >
-    //               {page.name}
-    //             </Link>
-    //           </Button>
-    //         ))}
-    //       </Box>
-
-    //       <Box sx={{ flexGrow: 0 }}>
-    //         {session ? (
-    //           <Tooltip title="Abrir configurações do perfil">
-    //             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-    //               <Avatar
-    //                 alt={session?.user?.name?.toString()}
-    //                 src={session.user?.image?.toString()}
-    //               />
-    //             </IconButton>
-    //           </Tooltip>
-    //         ) : (
-    //           <Button
-    //             variant="outlined"
-    //             color="primary"
-    //             onClick={() => signIn()}
-    //           >
-    //             login com
-    //             <AiFillGithub size={30} style={{ marginLeft: "1rem" }} />
-    //           </Button>
-    //         )}
-
-    //         <Menu
-    //           sx={{ mt: "45px" }}
-    //           id="menu-appbar"
-    //           anchorEl={anchorElUser}
-    //           anchorOrigin={{
-    //             vertical: "top",
-    //             horizontal: "right",
-    //           }}
-    //           keepMounted
-    //           transformOrigin={{
-    //             vertical: "top",
-    //             horizontal: "right",
-    //           }}
-    //           open={Boolean(anchorElUser)}
-    //           onClose={handleCloseUserMenu}
-    //         >
-    //           {settings.map((setting) => (
-    //             <MenuItem
-    //               key={setting}
-    //               onClick={() => manageSettingsOptions(setting)}
-    //             >
-    //               <Typography textAlign="center">{setting}</Typography>
-    //             </MenuItem>
-    //           ))}
-    //         </Menu>
-    //       </Box>
-    //     </Toolbar>
-    //   </Container>
-    // </AppBar>
   );
 };
 

@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-// import { Container, Icon, Title, Header, Content, Input } from "./styles";
 import { FcCollapse } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
@@ -62,46 +61,54 @@ const CarSeats: React.FC<ICarSeats> = ({ isTypeFavorite }) => {
   }, [cars]);
 
   return (
-    <div>CarSeats</div>
-    // <Container>
-    //   <Header onClick={() => handleCollapse()}>
-    //     <Title>Assentos</Title>
-    //     <Icon isCollapseUp={isCollapseUp}>
-    //       <FcCollapse />
-    //     </Icon>
-    //   </Header>
-    //   {isCollapseUp ? (
-    //     ""
-    //   ) : (
-    //     <Content>
-    //       {seats.map((item, index) => {
-    //         return (
-    //           <Input key={index}>
-    //             <input
-    //               type="checkbox"
-    //               onChange={(e) => {
-    //                 {
-    //                   e.target.checked === true
-    //                     ? dispatch(addCategory(e.target.name.toLowerCase()))
-    //                     : dispatch(removeCategory(e.target.name.toLowerCase()));
-    //                 }
-    //               }}
-    //               name={item}
-    //             />
-    //             <label htmlFor={item}>
-    //               {item}{" "}
-    //               {numberOfCarsBySeats.map((obj) => {
-    //                 if (obj.seats === item) {
-    //                   return ` (${obj.count})`;
-    //                 }
-    //               })}
-    //             </label>
-    //           </Input>
-    //         );
-    //       })}
-    //     </Content>
-    //   )}
-    // </Container>
+    <>
+      <div>
+        <div className="flex cursor-pointer" onClick={() => handleCollapse()}>
+          <p className="flex items-center m-0">Assentos</p>
+          <div
+            className={`flex items-center transition-all duration-[.5s] ${
+              !isCollapseUp && "rotate-180"
+            } ml-auto cursor-pointer`}
+          >
+            <FcCollapse />
+          </div>
+        </div>
+        {isCollapseUp ? (
+          ""
+        ) : (
+          <div className="flex flex-col p-[1rem]">
+            {seats.map((item, index) => {
+              return (
+                <div className="mb-[0.5rem]" key={index}>
+                  <input
+                    className="mr-[0.5rem]"
+                    type="checkbox"
+                    onChange={(e) => {
+                      {
+                        e.target.checked === true
+                          ? dispatch(addCategory(e.target.name.toLowerCase()))
+                          : dispatch(
+                              removeCategory(e.target.name.toLowerCase())
+                            );
+                      }
+                    }}
+                    name={item}
+                  />
+                  <label htmlFor={item}>
+                    {item}{" "}
+                    {numberOfCarsBySeats.map((obj) => {
+                      if (obj.seats === item) {
+                        return ` (${obj.count})`;
+                      }
+                    })}
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

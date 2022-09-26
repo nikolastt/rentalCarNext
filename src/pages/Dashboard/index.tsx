@@ -114,7 +114,7 @@ const Dashboard: React.FC<IDashboard> = ({
 
         <div className="w-full  mt-12  ">
           <p className="text-center">Carros mais alugados</p>
-          <div className=" w-full h-[4s00px] border-solid border-[1px] border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20 rounded-xl  ">
+          <div className=" w-full h-[400px] border-solid border-[1px] border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20 rounded-xl  ">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart
                 cx="50%"

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import Cards from "../../components/Cards/intex";
 import AppBar from "../../components/AppBar";
 import { db } from "../../firebase/index";

@@ -88,7 +88,7 @@ const FilterByCategoryCollapse: React.FC<IFilterByCategoryCollapseProps> = ({
   }
 
   return (
-    <div className="mb-[1rem]">
+    <div className="my-[1rem]">
       <div className="flex cursor-pointer" onClick={() => handleCollapse()}>
         <p className="flex items-center m-0">Car Filter</p>
         <div
