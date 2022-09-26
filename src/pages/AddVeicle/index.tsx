@@ -15,7 +15,7 @@ import {
   Select,
   Snackbar,
 } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
+import { LoadingButton } from "@mui/lab";
 
 interface ICarProps {
   model: string;
