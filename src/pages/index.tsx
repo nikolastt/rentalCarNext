@@ -147,6 +147,6 @@ export const getStaticProps: GetStaticProps = async () => {
     props: {
       featuredCars,
     },
-    revalidate: 60,
+    revalidate: 60 * 60,
   };
 };

@@ -1,7 +1,10 @@
 import NextAuth from "next-auth";
 import type { NextAuthOptions } from "next-auth";
+import { FirestoreAdapter } from "@next-auth/firebase-adapter";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
+
+import { firebaseConfig } from "../../../firebase/index";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -21,12 +24,13 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  adapter: FirestoreAdapter(firebaseConfig),
   secret: process.env.NEXT_SECRET,
   callbacks: {
-    async session({ session, token }) {
+    async session({ session, user }) {
       return {
         ...session,
-        id: token.sub,
+        id: user.id,
       };
     },
   },

@@ -5,16 +5,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../redux/store";
 import { unstable_getServerSession } from "next-auth/next";
 import AppBar from "../../components/AppBar";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../firebase";
 import { Box } from "@mui/material";
 import { GetServerSideProps } from "next";
-import { setUSer } from "../../redux/userSlice";
-import { store } from "../../redux/store";
-import { ICarProps, getCars } from "../../redux/carsSlice";
+import { ICarProps } from "../../redux/carsSlice";
 import { LoadingButton } from "@mui/lab";
-
 import { authOptions } from "../api/auth/[...nextauth]";
+import { getUserDb, getCarsDb } from "../../services/handleDocsFirebase";
 
 export interface IUserProps {
   name: string;
@@ -24,7 +20,7 @@ export interface IUserProps {
 }
 
 interface IBooking {
-  user: IUserProps;
+  userId: string;
   arrayCars: ICarProps[];
   arrayFavorites: IDataProps[];
   lastVisible: any;
@@ -32,28 +28,13 @@ interface IBooking {
   cars: ICarProps[];
 }
 
-const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
+const Booking: React.FC<IBooking> = ({ arrayCars, arrayFavorites, userId }) => {
   const [carsInScreen, setCarsInScreen] = useState<ICarProps[]>([]);
   const filter = useSelector((state: RootState) => state.filterByCategory);
-  const dispatch = useDispatch();
   const [noMoreCars, setnoMoreCars] = React.useState(false);
   const [loading, setLoading] = useState(false);
   const [qntCarsInScreen, setQntCarsInScreen] = useState(6);
   const cars = arrayCars;
-
-  const userStore = useSelector((state: RootState) => state.userSlice.user);
-  const carsStore = useSelector((state: RootState) => state.carsSlice.cars);
-
-  useEffect(() => {
-    if (!userStore.email) {
-      dispatch(setUSer(user));
-    }
-  }, [dispatch, user, userStore]);
-  useEffect(() => {
-    if (carsStore.length <= 0) {
-      dispatch(getCars(cars));
-    }
-  }, [dispatch, cars, carsStore]);
 
   const handleChange = () => {
     if (cars.length - 6 > qntCarsInScreen) {
@@ -100,12 +81,12 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
     <>
       <AppBar />
       <div className="flex flex-col w-full bg-background rounded-md py-[1rem]">
-        <div className="px-6">
+        <div className="px-3">
           <SideLeft isTypeFavorite={false} />
         </div>
 
         {carsInScreen.length > 0 ? (
-          <div className="flex flex-col px-12 mt-6 ">
+          <div className="flex flex-col px-3 mt-6 ">
             {carsInScreen.map((item, index) => {
               if (index < qntCarsInScreen) {
                 return (
@@ -114,6 +95,7 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
                     key={item.model}
                     width="33.3%"
                     favorites={arrayFavorites}
+                    userId={userId}
                   />
                 );
               }
@@ -128,7 +110,6 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
             >
               <LoadingButton
                 loading={loading}
-                loadingPosition="start"
                 variant="outlined"
                 onClick={() => handleChange()}
                 disabled={noMoreCars ? true : false}
@@ -165,43 +146,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  const user = {
-    name: session?.user?.name,
-    email: session?.user?.email,
-    image: session?.user?.image,
-    id: session?.id,
-  };
-
-  const state = store.getState();
-
-  const favorites = state.favoritesSlice.cars;
-  const cars = state.carsSlice.cars;
-  let arrayCars: any = [];
-  let arrayFavorites: any = [];
-
-  if (favorites.length > 0) {
-    arrayFavorites = favorites;
-  } else {
-    const favoritesRef = collection(db, "Favorites");
-    const q = query(favoritesRef, where("userId", "==", user.id));
-    const documents = await getDocs(q);
-    documents.forEach((doc) => {
-      arrayFavorites.push({ ...doc.data(), id: doc.id });
-    });
-  }
-
-  if (cars.length > 0) {
-    arrayCars = cars;
-  } else {
-    const querySnapshot = await getDocs(collection(db, "cars"));
-    querySnapshot.forEach((doc) => {
-      arrayCars.push({ ...doc.data(), id: doc.id });
-    });
-  }
+  const userDb = await getUserDb(session?.id as string);
+  const arrayCars = await getCarsDb();
+  const arrayFavorites = userDb?.carFavorites || [];
 
   return {
     props: {
-      user,
+      userId: session?.id,
       arrayCars,
       arrayFavorites,
     },

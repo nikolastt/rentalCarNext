@@ -1,37 +1,27 @@
 import React, { useEffect, useState } from "react";
 import Cards, { IDataProps } from "../../components/Cards/intex";
 import SideLeft from "../../components/SideLeft";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, store } from "../../redux/store";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 import AppBar from "../../components/AppBar";
 import { ICarProps } from "../../redux/carsSlice";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../firebase";
-import { Box, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
 import { GetServerSideProps } from "next";
-import { getSession } from "next-auth/react";
-import { setFavoriteCars } from "../../redux/favoriteslice";
-import { setUSer } from "../../redux/userSlice";
 import { LoadingButton } from "@mui/lab";
 import NoFavorites from "../../components/NoFavorites";
+import { authOptions } from "../api/auth/[...nextauth]";
 
-interface IUserProps {
-  name: string;
-  email: string;
-  image: string;
-  id: string;
-}
+import { unstable_getServerSession } from "next-auth/next";
+import { getFavoritesCarUserBd } from "../../services/handleDocsFirebase";
 
 interface IFavorite {
-  user: IUserProps;
   arrayFavorites: IDataProps[];
 }
 
-const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
+const Favorites: React.FC<IFavorite> = ({ arrayFavorites }) => {
   const [carsInScreen, setCarsInScreen] = useState<ICarProps[]>([]);
   const filter = useSelector((state: RootState) => state.filterByCategory);
-  const dispatch = useDispatch();
-  const userStore = useSelector((state: RootState) => state.userSlice.user);
+
   const [qntCarsInScreen, setQntCarsInScreen] = useState(6);
   const [noMoreCars, setnoMoreCars] = React.useState(false);
 
@@ -47,20 +37,6 @@ const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
       setnoMoreCars(true);
     }
   };
-
-  useEffect(() => {
-    if (!userStore.email) {
-      dispatch(setUSer(user));
-    }
-  }, [dispatch, user, userStore]);
-
-  useEffect(() => {
-    if (favorites.length > 0) {
-      return;
-    } else {
-      dispatch(setFavoriteCars(arrayFavorites));
-    }
-  }, []);
 
   useEffect(() => {
     function handleCarsInScreen() {
@@ -100,11 +76,11 @@ const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
       <div className="flex flex-col w-full bg-background rounded-md py-[1rem]">
         {carsInScreen.length > 0 ? (
           <>
-            <div className="px-6">
+            <div className="px-3">
               <SideLeft isTypeFavorite={true} />
             </div>
 
-            <div className="flex flex-col px-12 mt-6">
+            <div className="flex flex-col px-3 mt-6">
               {carsInScreen.map((item, index) => {
                 if (index < qntCarsInScreen) {
                   return (
@@ -146,8 +122,12 @@ const Favorites: React.FC<IFavorite> = ({ user, arrayFavorites }) => {
 
 export default Favorites;
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const session = await getSession({ req });
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
 
   if (!session) {
     return {
@@ -158,41 +138,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
-  if (session.user?.email !== "nikolasbitencourtt@gmail.com") {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
-
-  const user = {
-    name: session.user?.name,
-    email: session.user?.email,
-    image: session.user?.image,
-    id: session.id,
-  };
-
-  const state = store.getState();
-
-  const favorites = state.favoritesSlice.cars;
-  let arrayFavorites: any = [];
-
-  if (favorites.length > 0) {
-    arrayFavorites = favorites;
-  } else {
-    const favoritesRef = collection(db, "Favorites");
-    const q = query(favoritesRef, where("userId", "==", user.id));
-    const documents = await getDocs(q);
-    documents.forEach((doc) => {
-      arrayFavorites.push({ ...doc.data(), id: doc.id });
-    });
-  }
+  const arrayFavorites = await getFavoritesCarUserBd(session?.id as string);
 
   return {
     props: {
-      user,
       arrayFavorites,
     },
   };

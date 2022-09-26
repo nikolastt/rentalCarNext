@@ -3,17 +3,18 @@ import { Spinner } from "react-bootstrap";
 import { FaUser } from "react-icons/fa";
 import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
 import { GiGearStickPattern } from "react-icons/gi";
-
-import { addFavoriteCar, removeFavoriteCar } from "../../redux/favoriteslice";
 import { ICarProps } from "../../redux/carsSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { addDoc, collection, deleteDoc, doc } from "firebase/firestore";
-import { db } from "../../firebase/index";
 import { RootState } from "../../redux/store";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  addFavoriteCarBd,
+  removeFavoriteCarBd,
+} from "../../services/handleDocsFirebase";
 
 interface ICardProps {
+  userId?: string;
   width?: string;
   isTypeFavorite?: boolean;
   car: ICarProps;
@@ -41,65 +42,26 @@ const Cards: React.FC<ICardProps> = ({
   setFavorite,
   favorites,
   isTypeAddCar,
+  userId,
 }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(setFavorite || false);
-  const user = useSelector((state: RootState) => state.userSlice.user);
-  const [carFavorite, setCarFavorite] = useState<IDataProps>();
-  const dispatch = useDispatch();
   const [isLoadingAddFavorites, setisLoadingAddFavorites] = useState(false);
 
   useEffect(() => {
     favorites?.map((carDb) => {
       if (carDb.model.toLowerCase() === car.model.toLowerCase()) {
         setIsFavorite(true);
-        setCarFavorite(carDb);
       }
     });
   }, [car.model, favorites]);
 
   const addFavoriteCarBD = async () => {
-    const ref = collection(db, "Favorites");
-    await addDoc(ref, {
-      model: car.model,
-      autoMaker: car.autoMaker,
-      amount: car.amount,
-      typeFuel: car.typeFuel,
-      category: car.category,
-      img: car.img,
-      seats: car.seats,
-      gear: car.gear,
-      userId: user?.id,
-    }).then((doc) => {
-      let data = {
-        model: car.model,
-        autoMaker: car.autoMaker,
-        amount: car.amount,
-        typeFuel: car.typeFuel,
-        category: car.category,
-        img: car.img,
-        seats: car.seats,
-        gear: car.gear,
-        userId: user?.id,
-        id: doc.id,
-      };
-
-      dispatch(addFavoriteCar(data));
-      setCarFavorite(data);
-    });
+    await addFavoriteCarBd(userId as string, car);
     setisLoadingAddFavorites(false);
   };
 
   const removeFavoriteCarBD = async () => {
-    if (!carFavorite?.id) {
-      return;
-    } else {
-      await deleteDoc(doc(db, "Favorites", carFavorite.id)).then((doc) => {
-        try {
-          dispatch(removeFavoriteCar(car));
-          setisLoadingAddFavorites(false);
-        } catch {}
-      });
-    }
+    await removeFavoriteCarBd(userId as string, car);
   };
 
   function handleIcon() {
@@ -109,7 +71,6 @@ const Cards: React.FC<ICardProps> = ({
       } else {
         removeFavoriteCarBD();
       }
-
       return !prevState;
     });
   }
@@ -119,7 +80,7 @@ const Cards: React.FC<ICardProps> = ({
       <div className="h-[87%] w-full rounded-lg border-[1px] border-solid border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20 shadow-lg p-3">
         <div className="h-[15%] bg-transparent">
           <div className="flex">
-            <Link href={user ? `/infoVeicle/${car.id}` : "/noLogin"} passHref>
+            <Link href={`/infoVeicle/${car.id}`} passHref>
               <div className="">
                 {car.autoMaker + " "}
                 {car.model}
