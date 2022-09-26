@@ -10,8 +10,8 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.NEXT_CLIENT_SECRET_GITHUB,
     }),
     GoogleProvider({
-      clientId: process.env.NEXT_CLIENT_ID_GOOGLE as string,
-      clientSecret: process.env.NEXT_CLIENT_SECRET_GOOGLE as string,
+      clientId: (process.env.NEXT_CLIENT_ID_GOOGLE as string) || "",
+      clientSecret: (process.env.NEXT_CLIENT_SECRET_GOOGLE as string) || "",
       authorization: {
         params: {
           prompt: "consent",
