@@ -3,16 +3,18 @@ import Cards, { IDataProps } from "../../components/Cards/intex";
 import SideLeft from "../../components/SideLeft";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../redux/store";
+import { unstable_getServerSession } from "next-auth/next";
 import AppBar from "../../components/AppBar";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
 import { Box } from "@mui/material";
 import { GetServerSideProps } from "next";
-import { getSession } from "next-auth/react";
 import { setUSer } from "../../redux/userSlice";
 import { store } from "../../redux/store";
 import { ICarProps, getCars } from "../../redux/carsSlice";
 import { LoadingButton } from "@mui/lab";
+
+import { authOptions } from "../api/auth/[...nextauth]";
 
 export interface IUserProps {
   name: string;
@@ -147,8 +149,12 @@ const Booking: React.FC<IBooking> = ({ user, arrayCars, arrayFavorites }) => {
 
 export default Booking;
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const session = await getSession({ req });
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
 
   if (!session) {
     return {
