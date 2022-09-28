@@ -1,27 +1,17 @@
 import React, { useMemo, useState } from "react";
 import { FcCollapse } from "react-icons/fc";
-import { RootState } from "../../redux/store";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addCategory, removeCategory } from "../../redux/filterByCategorySlice";
+import { ICarProps } from "../../redux/carsSlice";
 
 interface IFilterByCategoryCollapseProps {
-  isTypeFavorite: boolean;
+  cars: ICarProps[];
 }
 
 const FilterByCategoryCollapse: React.FC<IFilterByCategoryCollapseProps> = ({
-  isTypeFavorite,
+  cars,
 }) => {
   const [isCollapseUp, setIsCollapseUp] = useState(true);
-
-  if (isTypeFavorite) {
-  }
-  const cars = useSelector((state: RootState) => {
-    if (isTypeFavorite) {
-      return state.favoritesSlice.cars;
-    } else {
-      return state.carsSlice.cars;
-    }
-  });
 
   const dispatch = useDispatch();
 

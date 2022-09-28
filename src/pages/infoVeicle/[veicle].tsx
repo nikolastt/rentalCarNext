@@ -8,27 +8,20 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { GetServerSideProps } from "next";
-import { getSession } from "next-auth/react";
 import Image from "next/image";
 import ResponsiveAppBar from "../../components/AppBar";
-import { db } from "../../firebase";
 import { ICarProps } from "../../redux/carsSlice";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
 import { LoadingButton } from "@mui/lab";
 import { useRouter } from "next/router";
-
-interface IUserProps {
-  name: string;
-  email: string;
-  image: string;
-  id: string;
-}
+import { addVeicleLocated, getCar } from "../../services/handleDocsFirebase";
+import { authOptions } from "../api/auth/[...nextauth]";
+import { unstable_getServerSession } from "next-auth";
 
 interface IInforVeicles {
-  user: IUserProps;
+  userId: string;
   car: ICarProps;
   id: String;
 }
@@ -39,7 +32,7 @@ export interface State extends SnackbarOrigin {
   open: boolean;
 }
 
-const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
+const InfoVeicle: React.FC<IInforVeicles> = ({ userId, car, id }) => {
   const [extra1, setExtra1] = useState(0);
   const [extra2, setExtra2] = useState(0);
 
@@ -54,8 +47,6 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
     vertical: "top",
     horizontal: "right",
   });
-
-  const ref = collection(db, "RentedCars");
 
   const [valueDateLocation, setValueDateLocation] = React.useState<Date | null>(
     new Date()
@@ -89,32 +80,25 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
     setIsLoading(true);
 
     try {
-      await addDoc(ref, {
-        model: car.model,
-        autoMaker: car.autoMaker,
-        amount: car.amount,
-        typeFuel: car.typeFuel,
-        category: car.category,
-        img: car.img,
-        seats: car.seats,
-        gear: car.gear,
-        userId: user?.id,
+      await addVeicleLocated(
+        car,
         extra1,
         extra2,
-        valueDateLocation: valueDateLocation?.toDateString(),
-        valueDateDevolution: valueDateDevolution?.toDateString(),
+        valueDateLocation,
+        valueDateDevolution,
         id,
-      }).then(() => {
-        setIsLoading(false);
-        handleClick(
-          {
-            vertical: "top",
-            horizontal: "right",
-          },
-          { openSuccess: true }
-        );
-        router.push("/RentedCars");
-      });
+        userId
+      );
+
+      setIsLoading(false);
+      handleClick(
+        {
+          vertical: "top",
+          horizontal: "right",
+        },
+        { openSuccess: true }
+      );
+      router.push("/RentedCars");
     } catch {
       setIsLoading(false);
       handleClick(
@@ -252,11 +236,13 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ user, car, id }) => {
 
 export default InfoVeicle;
 
-export const getServerSideProps: GetServerSideProps = async ({
-  req,
-  params,
-}) => {
-  const session = await getSession({ req });
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
+
   if (!session) {
     return {
       redirect: {
@@ -266,22 +252,15 @@ export const getServerSideProps: GetServerSideProps = async ({
     };
   }
 
-  const user = {
-    name: session.user?.name,
-    email: session.user?.email,
-    image: session.user?.image,
-    id: session.id,
-  };
-  const id = params?.veicle;
+  const userId = session?.id;
 
-  let car;
-  const docRef = doc(db, "cars", `${id}`);
-  const document = await getDoc(docRef);
-  car = document.data();
+  const id = context.params?.veicle;
+
+  const car = await getCar(id as string);
 
   return {
     props: {
-      user,
+      userId,
       car,
       id,
     },

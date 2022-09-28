@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Cards, { IDataProps } from "../../components/Cards/intex";
-import SideLeft from "../../components/SideLeft";
+import FilteredContainer from "../../components/FilteredContainer";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../redux/store";
 import { unstable_getServerSession } from "next-auth/next";
@@ -20,7 +20,7 @@ export interface IUserProps {
 }
 
 interface IBooking {
-  userId: string;
+  user: IUserProps;
   arrayCars: ICarProps[];
   arrayFavorites: IDataProps[];
   lastVisible: any;
@@ -28,7 +28,7 @@ interface IBooking {
   cars: ICarProps[];
 }
 
-const Booking: React.FC<IBooking> = ({ arrayCars, arrayFavorites, userId }) => {
+const Booking: React.FC<IBooking> = ({ arrayCars, arrayFavorites, user }) => {
   const [carsInScreen, setCarsInScreen] = useState<ICarProps[]>([]);
   const filter = useSelector((state: RootState) => state.filterByCategory);
   const [noMoreCars, setnoMoreCars] = React.useState(false);
@@ -82,7 +82,7 @@ const Booking: React.FC<IBooking> = ({ arrayCars, arrayFavorites, userId }) => {
       <AppBar />
       <div className="flex flex-col w-full bg-background rounded-md py-[1rem]">
         <div className="px-3">
-          <SideLeft isTypeFavorite={false} />
+          <FilteredContainer cars={cars} />
         </div>
 
         {carsInScreen.length > 0 ? (
@@ -95,7 +95,7 @@ const Booking: React.FC<IBooking> = ({ arrayCars, arrayFavorites, userId }) => {
                     key={item.model}
                     width="33.3%"
                     favorites={arrayFavorites}
-                    userId={userId}
+                    userId={user.id}
                   />
                 );
               }
@@ -146,13 +146,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
+  const user = {
+    image: session?.user?.image,
+    email: session?.user?.email,
+    name: session?.user?.name,
+    id: session?.id,
+  };
+
   const userDb = await getUserDb(session?.id as string);
   const arrayCars = await getCarsDb();
   const arrayFavorites = userDb?.carFavorites || [];
 
   return {
     props: {
-      userId: session?.id,
+      user,
       arrayCars,
       arrayFavorites,
     },

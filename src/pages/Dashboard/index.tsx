@@ -1,7 +1,5 @@
 import { useTheme } from "@mui/material";
-import { collection, getDocs } from "firebase/firestore";
 import { GetServerSideProps } from "next";
-import { getSession } from "next-auth/react";
 import React from "react";
 import {
   Bar,
@@ -19,7 +17,6 @@ import {
   YAxis,
 } from "recharts";
 import ResponsiveAppBar from "../../components/AppBar";
-import { db } from "../../firebase";
 
 import {
   Chart as ChartJS,
@@ -31,12 +28,33 @@ import { Pie } from "react-chartjs-2";
 import getMonthString from "../../assets/returnMonthString";
 
 import { HiCurrencyDollar } from "react-icons/hi";
+import { unstable_getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]";
+import { getAllRentedCars } from "../../services/handleDocsFirebase";
+import { ICarProps } from "../../redux/carsSlice";
 
 interface IDashboard {
   dataMostRentedVeicles: any;
   dataMostRentedCars: any;
   dataNumberOfCarsRentedInTheMonths: any;
   totalMoney: number;
+}
+
+interface IRentedCar {
+  amount: string;
+  autoMaker: string;
+  category: string;
+  extra1: number;
+  extra2: number;
+  gear: string;
+  id: string;
+  img: string;
+  model: string;
+  seats: string;
+  typeFuel: string;
+  userId: string;
+  valueDateDevolution: string;
+  valueDateLocation: string;
 }
 
 ChartJS.register(ArcElement, TooltipChart, LegendChart);
@@ -169,8 +187,12 @@ const Dashboard: React.FC<IDashboard> = ({
 
 export default Dashboard;
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const session = await getSession({ req });
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
 
   if (!session) {
     return {
@@ -181,21 +203,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
-  const user = {
-    name: session.user?.name,
-    email: session.user?.email,
-    image: session.user?.image,
-    id: session.id,
-  };
-
-  const arrayDataVaiclesLocated: any[] = [];
-  const querySnapshot = await getDocs(collection(db, "RentedCars"));
-  querySnapshot.forEach((doc) => {
-    arrayDataVaiclesLocated.push({ ...doc.data() });
-  });
+  const arrayDataVaiclesLocated = await getAllRentedCars();
 
   const nameCars: string[] = [];
-  arrayDataVaiclesLocated.map((car) => {
+  arrayDataVaiclesLocated.map((car: ICarProps) => {
     if (!nameCars.includes(car.model)) {
       nameCars.push(car.model);
     }
@@ -205,7 +216,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   nameCars.map((name) => {
     let quantidade = 0;
     let nome = name;
-    arrayDataVaiclesLocated.map((car) => {
+    arrayDataVaiclesLocated.map((car: ICarProps) => {
       if (name === car.model) {
         quantidade++;
         name = car.model;
@@ -230,7 +241,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   });
 
   const categories: any = [];
-  arrayDataVaiclesLocated.forEach((car) => {
+  arrayDataVaiclesLocated.forEach((car: ICarProps) => {
     categories.push(car.category);
   });
 
@@ -280,7 +291,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   const meses: number[] = [];
   let totalMoney = 0;
-  arrayDataVaiclesLocated.map((car) => {
+  arrayDataVaiclesLocated.map((car: IRentedCar) => {
     totalMoney +=
       Number(car.amount.replace(".", "")) +
       Number(car.extra1) +
@@ -307,7 +318,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     let countCars = 0;
     let monthString;
     monthString = getMonthString(mes);
-    arrayDataVaiclesLocated.map((car) => {
+    arrayDataVaiclesLocated.map((car: IRentedCar) => {
       const date = new Date(Date.parse(car.valueDateDevolution));
       if (date.getMonth() + 1 === mes) {
         countCars++;
@@ -323,7 +334,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   return {
     props: {
-      user,
       dataMostRentedVeicles,
       dataMostRentedCars,
       dataNumberOfCarsRentedInTheMonths,

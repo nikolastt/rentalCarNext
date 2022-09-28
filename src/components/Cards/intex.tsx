@@ -4,8 +4,6 @@ import { FaUser } from "react-icons/fa";
 import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
 import { GiGearStickPattern } from "react-icons/gi";
 import { ICarProps } from "../../redux/carsSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -76,8 +74,8 @@ const Cards: React.FC<ICardProps> = ({
   }
 
   return (
-    <div className="w-full h-[250px] max-w-[650px]">
-      <div className="h-[87%] w-full rounded-lg border-[1px] border-solid border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20 shadow-lg p-3">
+    <div className="w-full h-[250px] max-w-[650px] ">
+      <div className="h-[87%] w-full rounded-lg border-[1px] border-solid border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20 shadow-lg p-3 cursor-pointer">
         <div className="h-[15%] bg-transparent">
           <div className="flex">
             <Link href={`/infoVeicle/${car.id}`} passHref>

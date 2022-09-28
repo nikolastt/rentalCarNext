@@ -15,14 +15,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { store } from "../../redux/store";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../firebase";
 import { ICarProps } from "../../redux/carsSlice";
 import Link from "next/link";
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { AiOutlineWarning } from "react-icons/ai";
 import NoFavorites from "../../components/NoFavorites";
+import { getFavoritesCarUserBd } from "../../services/handleDocsFirebase";
 
 interface IUser {
   user: IUserProps;
@@ -99,7 +97,7 @@ const UserProfile: React.FC<IUser> = ({ user, arrayFavorites }) => {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="mt-36">
+          <div className="mt-36 w-full">
             <NoFavorites />
           </div>
         )}
@@ -110,7 +108,7 @@ const UserProfile: React.FC<IUser> = ({ user, arrayFavorites }) => {
           </p>
 
           <Link href="/Dashboard">
-            <button className="flex mt-6 border-solid border-[1px] border-primary-500 py-2 px-12 rounded-md hover:scale-105 ease-in duration-200">
+            <button className="flex mt-6 border-solid border-[1px] border-primary-500 py-2 px-12 rounded-md hover:scale-105 ease-in duration-200 w-1/2 justify-center">
               Ir para dashboard!
               <AiOutlineArrowRight style={{ marginLeft: "0.5rem" }} size={20} />
             </button>
@@ -134,28 +132,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       },
     };
   }
+
   const user = {
-    name: session.user?.name,
-    email: session.user?.email,
-    image: session.user?.image,
-    id: session.id,
+    image: session?.user?.image,
+    email: session?.user?.email,
+    name: session?.user?.name,
+    id: session?.id,
   };
 
-  const state = store.getState();
-
-  const favorites = state.favoritesSlice.cars;
-  let arrayFavorites: any = [];
-
-  if (favorites.length > 0) {
-    arrayFavorites = favorites;
-  } else {
-    const favoritesRef = collection(db, "Favorites");
-    const q = query(favoritesRef, where("userId", "==", user.id));
-    const documents = await getDocs(q);
-    documents.forEach((doc) => {
-      arrayFavorites.push({ ...doc.data(), id: doc.id });
-    });
-  }
+  const arrayFavorites = await getFavoritesCarUserBd(user.id as string);
 
   return {
     props: {

@@ -10,7 +10,9 @@ const NoFavorites: React.FC = () => {
       <FaRegSadCry size={65} className="text-text-secondary" />
 
       <Link href="/Booking">
-        <button className="mt-6">Ir para veículos</button>
+        <button className="mt-6 flex border border-primary-500 py-2 px-12 rounded-md hover:scale-105 ease-in duration-200 w-1/2 justify-center">
+          Ir para veículos
+        </button>
       </Link>
     </div>
   );

@@ -3,6 +3,7 @@ import { FcCollapse } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { addCategory, removeCategory } from "../../redux/filterByCategorySlice";
+import { ICarProps } from "../../redux/carsSlice";
 
 interface ISeatsAmount {
   seats: string;
@@ -10,19 +11,12 @@ interface ISeatsAmount {
 }
 
 interface ICarSeats {
-  isTypeFavorite?: boolean;
+  cars: ICarProps[];
 }
 
-const CarSeats: React.FC<ICarSeats> = ({ isTypeFavorite }) => {
+const CarSeats: React.FC<ICarSeats> = ({ cars }) => {
   const [isCollapseUp, setIsCollapseUp] = useState(true);
 
-  const cars = useSelector((state: RootState) => {
-    if (isTypeFavorite) {
-      return state.favoritesSlice.cars;
-    } else {
-      return state.carsSlice.cars;
-    }
-  });
   const dispatch = useDispatch();
 
   function handleCollapse() {

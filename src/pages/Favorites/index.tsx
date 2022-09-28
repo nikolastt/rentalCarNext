@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Cards, { IDataProps } from "../../components/Cards/intex";
-import SideLeft from "../../components/SideLeft";
+import FilteredContainer from "../../components/FilteredContainer";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import AppBar from "../../components/AppBar";
@@ -13,21 +13,21 @@ import { authOptions } from "../api/auth/[...nextauth]";
 
 import { unstable_getServerSession } from "next-auth/next";
 import { getFavoritesCarUserBd } from "../../services/handleDocsFirebase";
+import { IUserProps } from "../Booking";
 
 interface IFavorite {
   arrayFavorites: IDataProps[];
+  user: IUserProps;
 }
 
-const Favorites: React.FC<IFavorite> = ({ arrayFavorites }) => {
+const Favorites: React.FC<IFavorite> = ({ arrayFavorites, user }) => {
   const [carsInScreen, setCarsInScreen] = useState<ICarProps[]>([]);
   const filter = useSelector((state: RootState) => state.filterByCategory);
 
   const [qntCarsInScreen, setQntCarsInScreen] = useState(6);
   const [noMoreCars, setnoMoreCars] = React.useState(false);
 
-  const favorites = useSelector(
-    (state: RootState) => state.favoritesSlice.cars
-  );
+  const favorites = arrayFavorites;
 
   const handleChange = () => {
     if (favorites.length - 6 > qntCarsInScreen) {
@@ -77,7 +77,7 @@ const Favorites: React.FC<IFavorite> = ({ arrayFavorites }) => {
         {carsInScreen.length > 0 ? (
           <>
             <div className="px-3">
-              <SideLeft isTypeFavorite={true} />
+              <FilteredContainer cars={arrayFavorites} />
             </div>
 
             <div className="flex flex-col px-3 mt-6">
@@ -89,6 +89,7 @@ const Favorites: React.FC<IFavorite> = ({ arrayFavorites }) => {
                       key={item.model}
                       favorites={arrayFavorites}
                       width="33.3%"
+                      userId={user.id}
                     />
                   );
                 }
@@ -138,10 +139,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  const arrayFavorites = await getFavoritesCarUserBd(session?.id as string);
+  const user = {
+    image: session?.user?.image,
+    email: session?.user?.email,
+    name: session?.user?.name,
+    id: session?.id,
+  };
+
+  const arrayFavorites = await getFavoritesCarUserBd(user.id as string);
 
   return {
     props: {
+      user,
       arrayFavorites,
     },
   };
