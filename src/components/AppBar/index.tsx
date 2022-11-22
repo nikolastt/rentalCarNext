@@ -32,17 +32,65 @@ const ResponsiveAppBar: React.FC = () => {
 
         <div className="ml-auto flex">
           <nav className="">
-            <ul className="flex space-x-6">
-              <div className="">Home</div>
-              <div className="">Veículos</div>
-              <div className="">Meus Favoritos</div>
-              <div className="">Adicionar Veículo</div>
+            <ul className="flex space-x-6 items-center">
+              <Link href="/">
+                <li>
+                  <button className="hover:text-primary-500">Home</button>
+                </li>
+              </Link>
+
+              <Link href="/Booking">
+                <li>
+                  <button className="hover:text-primary-500">Veículos</button>
+                </li>
+              </Link>
+
+              <Link href="/Favorites">
+                <li>
+                  <button className="hover:text-primary-500">
+                    Meus Favoritos
+                  </button>
+                </li>
+              </Link>
+
+              <Link href="/AddVeicle">
+                <li>
+                  <button className="hover:text-primary-500">
+                    Adicionar Veículo
+                  </button>
+                </li>
+              </Link>
+
+              <Link href="/Profile">
+                <li>
+                  <button className="hover:text-primary-500">Perfil</button>
+                </li>
+              </Link>
+              {session ? (
+                <li>
+                  <button
+                    onClick={() => signOut()}
+                    className="px-6 my-1 border border-primary-500 rounded-md hover:scale-105 duration-200"
+                  >
+                    Sair
+                  </button>
+                </li>
+              ) : (
+                <li>
+                  <button
+                    onClick={() =>
+                      signIn("google", {
+                        callbackUrl: `${window.location.origin}/Booking`,
+                      })
+                    }
+                    className="flex items-center px-6 py-2 rounded-md hover:scale-105 duration-200 border border-primary-500"
+                  >
+                    Login <FcGoogle className="ml-3" size={25} />
+                  </button>
+                </li>
+              )}
             </ul>
           </nav>
-
-          <div className="ml-6">
-            <button>LOGIN COM</button>
-          </div>
         </div>
       </div>
 

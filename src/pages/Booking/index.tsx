@@ -80,26 +80,28 @@ const Booking: React.FC<IBooking> = ({ arrayCars, arrayFavorites, user }) => {
   return (
     <>
       <AppBar />
-      <div className="flex flex-col w-full bg-background rounded-md py-[1rem]">
-        <div className="px-3">
+      <div className="flex flex-col w-full bg-background rounded-md py-[1rem] ">
+        <div className="px-3 max-w-lg w-full mx-auto">
           <FilteredContainer cars={cars} />
         </div>
 
         {carsInScreen.length > 0 ? (
-          <div className="flex flex-col px-3 mt-6 ">
-            {carsInScreen.map((item, index) => {
-              if (index < qntCarsInScreen) {
-                return (
-                  <Cards
-                    car={item}
-                    key={item.model}
-                    width="33.3%"
-                    favorites={arrayFavorites}
-                    userId={user.id}
-                  />
-                );
-              }
-            })}
+          <>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 px-6 mt-6  ">
+              {carsInScreen.map((item, index) => {
+                if (index < qntCarsInScreen) {
+                  return (
+                    <Cards
+                      car={item}
+                      key={item.model}
+                      width="33.3%"
+                      favorites={arrayFavorites}
+                      userId={user.id}
+                    />
+                  );
+                }
+              })}
+            </div>
             <Box
               sx={{
                 display: "flex ",
@@ -117,7 +119,7 @@ const Booking: React.FC<IBooking> = ({ arrayCars, arrayFavorites, user }) => {
                 {noMoreCars ? "NÃO HÁ MAIS CARROS" : "CARREGAR MAIS CARROS"}
               </LoadingButton>
             </Box>
-          </div>
+          </>
         ) : (
           <div>
             <h1>Carregando</h1>

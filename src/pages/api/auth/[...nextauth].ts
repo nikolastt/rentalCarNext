@@ -8,10 +8,6 @@ import { firebaseConfig } from "../../../firebase/index";
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    GithubProvider({
-      clientId: process.env.NEXT_CLIENT_ID_GITHUB as string,
-      clientSecret: process.env.NEXT_CLIENT_SECRET_GITHUB as string,
-    }),
     GoogleProvider({
       clientId: (process.env.NEXT_CLIENT_ID_GOOGLE as string) || "",
       clientSecret: (process.env.NEXT_CLIENT_SECRET_GOOGLE as string) || "",

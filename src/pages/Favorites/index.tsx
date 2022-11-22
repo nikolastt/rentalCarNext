@@ -76,11 +76,11 @@ const Favorites: React.FC<IFavorite> = ({ arrayFavorites, user }) => {
       <div className="flex flex-col w-full bg-background rounded-md py-[1rem]">
         {carsInScreen.length > 0 ? (
           <>
-            <div className="px-3">
+            <div className="px-3 max-w-lg w-full mx-auto">
               <FilteredContainer cars={arrayFavorites} />
             </div>
 
-            <div className="flex flex-col px-3 mt-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 px-6 mt-6 ">
               {carsInScreen.map((item, index) => {
                 if (index < qntCarsInScreen) {
                   return (
@@ -94,24 +94,24 @@ const Favorites: React.FC<IFavorite> = ({ arrayFavorites, user }) => {
                   );
                 }
               })}
-              <Box
-                sx={{
-                  display: "flex ",
-                  justifyContent: "center",
-                  width: "100%",
-                  marginTop: "1.5rem",
-                }}
-              >
-                <LoadingButton
-                  loadingPosition="start"
-                  variant="outlined"
-                  onClick={() => handleChange()}
-                  disabled={noMoreCars ? true : false}
-                >
-                  {noMoreCars ? "NÃO HÁ MAIS CARROS" : "CARREGAR MAIS CARROS"}
-                </LoadingButton>
-              </Box>
             </div>
+            <Box
+              sx={{
+                display: "flex ",
+                justifyContent: "center",
+                width: "100%",
+                marginTop: "1.5rem",
+              }}
+            >
+              <LoadingButton
+                loadingPosition="start"
+                variant="outlined"
+                onClick={() => handleChange()}
+                disabled={noMoreCars ? true : false}
+              >
+                {noMoreCars ? "NÃO HÁ MAIS CARROS" : "CARREGAR MAIS CARROS"}
+              </LoadingButton>
+            </Box>
           </>
         ) : (
           <NoFavorites />
