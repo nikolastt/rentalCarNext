@@ -133,7 +133,7 @@ const InfoVeicle: React.FC<IInforVeicles> = ({ userId, car, id }) => {
       <h1 className="text-center">
         {car.autoMaker} {car.model}
       </h1>
-      <div className="h-[calc(100vh-10rem)] w-full flex flex-col mt-[1rem]">
+      <div className="h-[calc(100vh-10rem)] w-full flex flex-col mt-[1rem] container ">
         <div className="w-full flex justify-center items-center px-3">
           <div className="relative w-[400px] h-[300px] flex justify-center items-center rounded-[1.5rem] overflow-hidden border-solid border-[1px] border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20 shadow backdrop-blur-lg">
             <div className="relative w-[85%] h-[75%]">

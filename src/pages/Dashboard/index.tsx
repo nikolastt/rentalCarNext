@@ -105,7 +105,7 @@ const Dashboard: React.FC<IDashboard> = ({
     <>
       <ResponsiveAppBar />
 
-      <div className="w-full min-h-screen px-3 lg:grid grid-cols-2 gap-3 ">
+      <div className="w-full min-h-screen px-3 lg:grid grid-cols-2 gap-6 container ">
         <div>
           <p className="text-center">Total veículos alugados por mes</p>
           <div className="w-full h-[400px]  rounded-xl border-solid border-[1px] border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20  ">

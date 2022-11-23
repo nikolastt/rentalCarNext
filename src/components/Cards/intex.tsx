@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { HTMLAttributes, useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
 import { FaUser } from "react-icons/fa";
 import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
@@ -11,7 +11,7 @@ import {
   removeFavoriteCarBd,
 } from "../../services/handleDocsFirebase";
 
-interface ICardProps {
+interface ICardProps extends HTMLAttributes<HTMLDivElement> {
   userId?: string;
   width?: string;
   isTypeFavorite?: boolean;
@@ -19,6 +19,7 @@ interface ICardProps {
   setFavorite?: boolean;
   favorites?: IDataProps[];
   isTypeAddCar?: boolean;
+  isTypeCarrosel: boolean;
 }
 
 export interface IDataProps {
@@ -41,6 +42,7 @@ const Cards: React.FC<ICardProps> = ({
   favorites,
   isTypeAddCar,
   userId,
+  isTypeCarrosel,
 }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(setFavorite || false);
   const [isLoadingAddFavorites, setisLoadingAddFavorites] = useState(false);
@@ -75,7 +77,11 @@ const Cards: React.FC<ICardProps> = ({
 
   return (
     <div className="w-full h-[250px] ">
-      <div className="h-full w-full rounded-lg border-[1px] border-solid border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20 shadow-lg p-3 cursor-pointer">
+      <div
+        className={` ${
+          isTypeCarrosel ? "h-[75%]" : "h-full"
+        }   w-full rounded-lg border-[1px] border-solid border-primary-500 bg-gradient-to-br from-[#101010] to-primary-500/20 shadow-lg p-3 cursor-pointer`}
+      >
         <div className="h-[15%] bg-transparent">
           <div className="flex">
             <Link href={`/infoVeicle/${car.id}`} passHref>

@@ -90,7 +90,7 @@ const Home: NextPage<IHome> = ({ featuredCars }) => {
               {featuredCars?.map((car, index) => {
                 return (
                   <SwiperSlide className="pt-6 pb-6" key={car.model + index}>
-                    <Cards car={car} isTypeFavorite={false} />
+                    <Cards car={car} isTypeFavorite={false} isTypeCarrosel />
                   </SwiperSlide>
                 );
               })}

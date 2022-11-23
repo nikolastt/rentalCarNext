@@ -50,7 +50,7 @@ const UserProfile: React.FC<IUser> = ({ user, arrayFavorites }) => {
   return (
     <>
       <AppBar />
-      <div className="w-full h-[calc(100vh-8rem)]  ">
+      <div className="w-full h-[calc(100vh-8rem)] container flex flex-col justify-center  ">
         <div className="flex  items-center px-3 w-full">
           <div className="w-[76px] h-[76px] bg-primary-500 flex items-center justify-center rounded-full">
             <div className="relative w-[70px] h-[70px] overflow-hidden  rounded-full ">
