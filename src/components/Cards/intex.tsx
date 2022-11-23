@@ -19,7 +19,7 @@ interface ICardProps extends HTMLAttributes<HTMLDivElement> {
   setFavorite?: boolean;
   favorites?: IDataProps[];
   isTypeAddCar?: boolean;
-  isTypeCarrosel: boolean;
+  isTypeCarrosel?: boolean;
 }
 
 export interface IDataProps {
