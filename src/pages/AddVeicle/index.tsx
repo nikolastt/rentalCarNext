@@ -16,6 +16,9 @@ import {
   Snackbar,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
+import { GetServerSideProps } from "next";
+import { authOptions } from "../api/auth/[...nextauth]";
+import { unstable_getServerSession } from "next-auth";
 
 interface ICarProps {
   model: string;
@@ -410,3 +413,33 @@ const AddVeicle: React.FC = () => {
 };
 
 export default AddVeicle;
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/NotLogin",
+        permanent: false,
+      },
+    };
+  }
+
+  if (session.user?.email !== "nikolasbitencourtt@gmail.com") {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+};
